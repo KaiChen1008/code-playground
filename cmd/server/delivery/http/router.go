@@ -86,7 +86,7 @@ func uiHandler() gin.HandlerFunc {
 			return
 		}
 
-		if _, err := ui.Static.Open(path); err == nil {
+		if _, err := ui.Static.Open(path[1:]); err == nil {
 			fileServer.ServeHTTP(c.Writer, c.Request)
 			return
 		}

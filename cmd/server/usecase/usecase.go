@@ -19,15 +19,21 @@ type usecase struct {
 	maxTotalSubmissions int
 	languages           map[string]config.LanguageConfig
 	submissionCount     int64
+	semaphore           chan struct{}
 }
 
-func New(repo domain.Repository, runner domain.CodeRunner, maxCodeChars int, maxTotalSubmissions int, languages map[string]config.LanguageConfig) *usecase {
+func New(repo domain.Repository, runner domain.CodeRunner, maxCodeChars int, maxTotalSubmissions int, languages map[string]config.LanguageConfig, maxConcurrentRunners int) *usecase {
+	var sem chan struct{}
+	if maxConcurrentRunners > 0 {
+		sem = make(chan struct{}, maxConcurrentRunners)
+	}
 	return &usecase{
 		repo:                repo,
 		runner:              runner,
 		maxCodeChars:        maxCodeChars,
 		maxTotalSubmissions: maxTotalSubmissions,
 		languages:           languages,
+		semaphore:           sem,
 	}
 }
 
@@ -41,6 +47,17 @@ func (uc *usecase) RunSnippet(ctx context.Context, req *models.RunRequest) (*mod
 		if count > int64(uc.maxTotalSubmissions) {
 			atomic.AddInt64(&uc.submissionCount, -1) // revert
 			return nil, fmt.Errorf("server has reached maximum number of submissions (%d)", uc.maxTotalSubmissions)
+		}
+	}
+
+	if uc.semaphore != nil {
+		select {
+		case uc.semaphore <- struct{}{}:
+			defer func() {
+				<-uc.semaphore
+			}()
+		case <-ctx.Done():
+			return nil, ctx.Err()
 		}
 	}
 
@@ -83,6 +100,17 @@ func (uc *usecase) DeleteSnippet(ctx context.Context, id string) error {
 }
 
 func (uc *usecase) FormatSnippet(ctx context.Context, req *models.FormatRequest) (*models.FormatResponse, error) {
+	if uc.semaphore != nil {
+		select {
+		case uc.semaphore <- struct{}{}:
+			defer func() {
+				<-uc.semaphore
+			}()
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		}
+	}
+
 	formatted, err := uc.runner.Format(ctx, *req.Language, *req.Code)
 	if err != nil {
 		return nil, fmt.Errorf("failed to format: %w", err)

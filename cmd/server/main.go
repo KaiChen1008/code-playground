@@ -24,6 +24,7 @@ func main() {
 	languages := cfg.Languages
 	maxCodeChars := cfg.Server.MaxCodeChars
 	maxTotalSubmissions := cfg.Server.MaxTotalSubmissions
+	maxConcurrentRunners := cfg.Server.MaxConcurrentRunners
 	rateLimit := cfg.Server.RateLimit
 	port := cfg.Server.Port
 
@@ -33,7 +34,7 @@ func main() {
 	}
 
 	codeRunner := runner.NewTestcontainersRunner(languages)
-	uc := usecase.New(repo, codeRunner, maxCodeChars, maxTotalSubmissions, languages)
+	uc := usecase.New(repo, codeRunner, maxCodeChars, maxTotalSubmissions, languages, maxConcurrentRunners)
 	handler := http.NewSnippetHandler(uc)
 	r := http.NewRouter(rateLimit, handler)
 

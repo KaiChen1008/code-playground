@@ -4,6 +4,7 @@ server:
   rate_limit: 5
   max_total_submissions: 100
   max_code_chars: 3000
+  max_concurrent_runners: 10
 
 languages:
   golang:

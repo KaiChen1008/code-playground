@@ -1,6 +1,6 @@
-# share - Self-Hosted Code Playground
+# code-playground
 
-**share** is a lightweight, self-hosted code execution platform (similar to ideone.com or Go Playground). It allows users to write, format, and execute snippets across multiple programming languages in isolated, secure environments.
+**code-playground** is a lightweight, self-hosted code execution platform (similar to ideone.com or Go Playground). It allows users to write, format, and execute snippets across multiple programming languages in isolated, secure environments.
 
 ![Platform Overview](https://img.shields.io/badge/Architecture-Clean--Arch-blue)
 ![Backend](https://img.shields.io/badge/Backend-Go-00ADD8)

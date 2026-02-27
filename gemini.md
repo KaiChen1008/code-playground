@@ -48,6 +48,12 @@ The project follows **Clean Architecture** principles to ensure separation of co
   - Use `testify/assert` or `testify/require`.
   - Mocking should be used for usecase unit tests to isolate logic.
 
+### Graceful Shutdown
+
+- **Implementation**: Use `signal.NotifyContext` to listen for `SIGINT` and `SIGTERM`.
+- **Server**: Use `http.Server` with a defined `BaseContext` to propagate the shutdown signal to all request handlers.
+- **Timeout**: Allow a grace period (e.g., 5 seconds) for active requests to complete before forced shutdown.
+
 ## 🚀 Common Commands
 
 - `make build`: Compiles the server binary.

@@ -1,7 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"net"
+	"net/http"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -35,10 +41,37 @@ func main() {
 	handler := delivery.NewSnippetHandler(uc)
 	r := delivery.NewRouter(rateLimit, handler)
 
-	addr := fmt.Sprintf(":%d", port)
+	// ref: github.com/gin-gonic/examples/tree/master/graceful-shutdown/graceful-shutdown/notify-with-context
+	// create context that listens for the interrupt signal from the OS.
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-	logrus.Infof("Server starting on %s", addr)
-	if err := r.Run(addr); err != nil {
-		logrus.Fatalf("failed to start server: %v", err)
+	addr := fmt.Sprintf(":%d", port)
+	svr := &http.Server{
+		Addr:    addr,
+		Handler: r,
 	}
+
+	svr.BaseContext = func(net.Listener) context.Context {
+		return ctx // for canceling running jobs
+	}
+
+	go func() {
+		logrus.Infof("Server starting on %s", addr)
+		if err := svr.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logrus.Fatalf("Failed to listen and serve: %v", err)
+		}
+	}()
+
+	// Listen for the interrupt signal.
+	<-ctx.Done()
+	logrus.Info("Shutting down server...")
+
+	// this context is used to inform the server that it has 5 seconds to finish
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := svr.Shutdown(ctx); err != nil {
+		logrus.Fatalf("Failed to shutdown server: %v", err)
+	}
+	logrus.Println("Server shutdown")
 }

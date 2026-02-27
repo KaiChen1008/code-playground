@@ -6,18 +6,18 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"code-playground/cmd/server/domain"
+	"code-playground/cmd/server/domain/models"
 )
 
-func TestFileSnippetRepository(t *testing.T) {
+func TestFileSnippetRepo(t *testing.T) {
 	tempDir, err := os.MkdirTemp("", "repo-test-*")
 	assert.NoError(t, err)
 	defer os.RemoveAll(tempDir)
 
-	repo, err := NewFileSnippetRepository(tempDir)
+	repo, err := NewFileSnippetRepo(tempDir)
 	assert.NoError(t, err)
 
-	snippet := &domain.Snippet{
+	snippet := &models.Snippet{
 		ID:       "test-id",
 		Language: "golang",
 		Code:     "fmt.Println(1)",

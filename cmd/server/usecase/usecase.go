@@ -8,29 +8,21 @@ import (
 	"sync/atomic"
 
 	"code-playground/cmd/server/domain"
-	"code-playground/cmd/server/repository"
+	"code-playground/cmd/server/domain/models"
 	"code-playground/pkg/config"
 )
 
-type SnippetUseCase interface {
-	RunSnippet(ctx context.Context, req *domain.RunRequest) (*domain.RunResponse, error)
-	GetSnippet(ctx context.Context, id string) (*domain.Snippet, error)
-	DeleteSnippet(ctx context.Context, id string) error
-	FormatSnippet(ctx context.Context, req *domain.FormatRequest) (*domain.FormatResponse, error)
-	GetLanguages(ctx context.Context) ([]domain.LanguageInfo, error)
-}
-
-type snippetUseCase struct {
-	repo                repository.SnippetRepository
-	runner              CodeRunner
+type usecase struct {
+	repo                domain.Repository
+	runner              domain.CodeRunner
 	maxCodeChars        int
 	maxTotalSubmissions int
 	languages           map[string]config.LanguageConfig
 	submissionCount     int64
 }
 
-func NewSnippetUseCase(repo repository.SnippetRepository, runner CodeRunner, maxCodeChars int, maxTotalSubmissions int, languages map[string]config.LanguageConfig) SnippetUseCase {
-	return &snippetUseCase{
+func New(repo domain.Repository, runner domain.CodeRunner, maxCodeChars int, maxTotalSubmissions int, languages map[string]config.LanguageConfig) *usecase {
+	return &usecase{
 		repo:                repo,
 		runner:              runner,
 		maxCodeChars:        maxCodeChars,
@@ -39,7 +31,7 @@ func NewSnippetUseCase(repo repository.SnippetRepository, runner CodeRunner, max
 	}
 }
 
-func (uc *snippetUseCase) RunSnippet(ctx context.Context, req *domain.RunRequest) (*domain.RunResponse, error) {
+func (uc *usecase) RunSnippet(ctx context.Context, req *models.RunRequest) (*models.RunResponse, error) {
 	if uc.maxCodeChars > 0 && req.Code != nil && len(*req.Code) > uc.maxCodeChars {
 		return nil, fmt.Errorf("code too long (max %d characters)", uc.maxCodeChars)
 	}
@@ -64,7 +56,7 @@ func (uc *snippetUseCase) RunSnippet(ctx context.Context, req *domain.RunRequest
 		rand.Read(b)
 		id = hex.EncodeToString(b)
 
-		snippet := &domain.Snippet{
+		snippet := &models.Snippet{
 			ID:       id,
 			Language: *req.Language,
 			Code:     *req.Code,
@@ -76,32 +68,32 @@ func (uc *snippetUseCase) RunSnippet(ctx context.Context, req *domain.RunRequest
 		}
 	}
 
-	return &domain.RunResponse{
+	return &models.RunResponse{
 		ID:     id,
 		Output: output,
 	}, nil
 }
 
-func (uc *snippetUseCase) GetSnippet(ctx context.Context, id string) (*domain.Snippet, error) {
+func (uc *usecase) GetSnippet(ctx context.Context, id string) (*models.Snippet, error) {
 	return uc.repo.GetByID(id)
 }
 
-func (uc *snippetUseCase) DeleteSnippet(ctx context.Context, id string) error {
+func (uc *usecase) DeleteSnippet(ctx context.Context, id string) error {
 	return uc.repo.Delete(id)
 }
 
-func (uc *snippetUseCase) FormatSnippet(ctx context.Context, req *domain.FormatRequest) (*domain.FormatResponse, error) {
+func (uc *usecase) FormatSnippet(ctx context.Context, req *models.FormatRequest) (*models.FormatResponse, error) {
 	formatted, err := uc.runner.Format(ctx, *req.Language, *req.Code)
 	if err != nil {
 		return nil, fmt.Errorf("failed to format: %w", err)
 	}
-	return &domain.FormatResponse{Code: formatted}, nil
+	return &models.FormatResponse{Code: formatted}, nil
 }
 
-func (uc *snippetUseCase) GetLanguages(ctx context.Context) ([]domain.LanguageInfo, error) {
-	var languages []domain.LanguageInfo
+func (uc *usecase) GetLanguages(ctx context.Context) ([]models.LanguageInfo, error) {
+	var languages []models.LanguageInfo
 	for name, langCfg := range uc.languages {
-		languages = append(languages, domain.LanguageInfo{
+		languages = append(languages, models.LanguageInfo{
 			Name:    name,
 			Version: langCfg.Version,
 		})

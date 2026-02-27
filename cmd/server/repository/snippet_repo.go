@@ -6,28 +6,22 @@ import (
 	"os"
 	"path/filepath"
 
-	"code-playground/cmd/server/domain"
+	"code-playground/cmd/server/domain/models"
 	"code-playground/pkg/errors"
 )
 
-type SnippetRepository interface {
-	Save(snippet *domain.Snippet) error
-	GetByID(id string) (*domain.Snippet, error)
-	Delete(id string) error
-}
-
-type fileSnippetRepository struct {
+type fileSnippetRepo struct {
 	dataDir string
 }
 
-func NewFileSnippetRepository(dataDir string) (SnippetRepository, error) {
+func NewFileSnippetRepo(dataDir string) (*fileSnippetRepo, error) {
 	if err := os.MkdirAll(dataDir, 0755); err != nil {
 		return nil, errors.New("failed to create data directory", err)
 	}
-	return &fileSnippetRepository{dataDir: dataDir}, nil
+	return &fileSnippetRepo{dataDir: dataDir}, nil
 }
 
-func (r *fileSnippetRepository) Save(snippet *domain.Snippet) error {
+func (r *fileSnippetRepo) Save(snippet *models.Snippet) error {
 	filePath := filepath.Join(r.dataDir, fmt.Sprintf("%s.json", snippet.ID))
 	data, err := json.Marshal(snippet)
 	if err != nil {
@@ -36,7 +30,7 @@ func (r *fileSnippetRepository) Save(snippet *domain.Snippet) error {
 	return os.WriteFile(filePath, data, 0644)
 }
 
-func (r *fileSnippetRepository) GetByID(id string) (*domain.Snippet, error) {
+func (r *fileSnippetRepo) GetByID(id string) (*models.Snippet, error) {
 	filePath := filepath.Join(r.dataDir, fmt.Sprintf("%s.json", id))
 	data, err := os.ReadFile(filePath)
 	if err != nil {
@@ -45,14 +39,14 @@ func (r *fileSnippetRepository) GetByID(id string) (*domain.Snippet, error) {
 		}
 		return nil, errors.New("failed to read snippet file", err)
 	}
-	var snippet domain.Snippet
+	var snippet models.Snippet
 	if err := json.Unmarshal(data, &snippet); err != nil {
 		return nil, errors.New("failed to unmarshal snippet", err)
 	}
 	return &snippet, nil
 }
 
-func (r *fileSnippetRepository) Delete(id string) error {
+func (r *fileSnippetRepo) Delete(id string) error {
 	filePath := filepath.Join(r.dataDir, fmt.Sprintf("%s.json", id))
 	err := os.Remove(filePath)
 	if err != nil {

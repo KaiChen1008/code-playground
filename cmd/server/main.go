@@ -27,13 +27,13 @@ func main() {
 	rateLimit := cfg.Server.RateLimit
 	port := cfg.Server.Port
 
-	repo, err := repository.NewFileSnippetRepository(dataDir)
+	repo, err := repository.NewFileSnippetRepo(dataDir)
 	if err != nil {
 		log.Fatalf("failed to initialize repository: %v", err)
 	}
 
 	codeRunner := runner.NewTestcontainersRunner(languages)
-	uc := usecase.NewSnippetUseCase(repo, codeRunner, maxCodeChars, maxTotalSubmissions, languages)
+	uc := usecase.New(repo, codeRunner, maxCodeChars, maxTotalSubmissions, languages)
 	handler := http.NewSnippetHandler(uc)
 	r := http.NewRouter(rateLimit, handler)
 

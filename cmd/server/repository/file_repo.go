@@ -10,18 +10,18 @@ import (
 	"code-playground/pkg/errors"
 )
 
-type fileSnippetRepo struct {
+type fileRepo struct {
 	dataDir string
 }
 
-func NewFileSnippetRepo(dataDir string) (*fileSnippetRepo, error) {
+func NewFileRepo(dataDir string) (*fileRepo, error) {
 	if err := os.MkdirAll(dataDir, 0755); err != nil {
 		return nil, errors.New("failed to create data directory", err)
 	}
-	return &fileSnippetRepo{dataDir: dataDir}, nil
+	return &fileRepo{dataDir: dataDir}, nil
 }
 
-func (r *fileSnippetRepo) Save(snippet *models.Snippet) error {
+func (r *fileRepo) Save(snippet *models.Snippet) error {
 	filePath := filepath.Join(r.dataDir, fmt.Sprintf("%s.json", snippet.ID))
 	data, err := json.Marshal(snippet)
 	if err != nil {
@@ -30,7 +30,7 @@ func (r *fileSnippetRepo) Save(snippet *models.Snippet) error {
 	return os.WriteFile(filePath, data, 0644)
 }
 
-func (r *fileSnippetRepo) GetByID(id string) (*models.Snippet, error) {
+func (r *fileRepo) GetByID(id string) (*models.Snippet, error) {
 	filePath := filepath.Join(r.dataDir, fmt.Sprintf("%s.json", id))
 	data, err := os.ReadFile(filePath)
 	if err != nil {
@@ -46,7 +46,7 @@ func (r *fileSnippetRepo) GetByID(id string) (*models.Snippet, error) {
 	return &snippet, nil
 }
 
-func (r *fileSnippetRepo) Delete(id string) error {
+func (r *fileRepo) Delete(id string) error {
 	filePath := filepath.Join(r.dataDir, fmt.Sprintf("%s.json", id))
 	err := os.Remove(filePath)
 	if err != nil {

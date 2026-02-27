@@ -28,7 +28,7 @@ func main() {
 	rateLimit := cfg.Server.RateLimit
 	port := cfg.Server.Port
 
-	repo, err := repository.NewFileSnippetRepo(dataDir)
+	repo, err := repository.NewFileRepo(dataDir)
 	if err != nil {
 		log.Fatalf("failed to initialize repository: %v", err)
 	}

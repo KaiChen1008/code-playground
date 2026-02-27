@@ -35,7 +35,7 @@ The project follows **Clean Architecture** principles to ensure separation of co
 ### Coding Style
 - **Go**: Follow standard `go fmt` and `go vet`. Use `go mod tidy` before any commit.
 - **Errors**: Always use the custom wrappers in `pkg/errors` to maintain stack traces and context.
-- **Naming**: Use idiomatic Go naming. Prefer `New` for the primary implementation constructor in its package (e.g., `usecase.New`). For specific implementations in the repository layer, use `New<Type><Name>Repo` (e.g., `repository.NewFileSnippetRepo`).
+- **Naming**: Use idiomatic Go naming. Prefer `New` for the primary implementation constructor in its package (e.g., `usecase.New`). For specific implementations in the repository layer, use `New<Type>Repo` (e.g., `repository.NewFileRepo`).
 
 ### Development Workflow
 - **API Changes**: Update `api/swagger.yaml` first, then run `make swagger` to regenerate models.

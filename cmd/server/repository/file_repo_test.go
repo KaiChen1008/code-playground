@@ -9,12 +9,12 @@ import (
 	"code-playground/cmd/server/domain/models"
 )
 
-func TestFileSnippetRepo(t *testing.T) {
+func TestFileRepo(t *testing.T) {
 	tempDir, err := os.MkdirTemp("", "repo-test-*")
 	assert.NoError(t, err)
 	defer os.RemoveAll(tempDir)
 
-	repo, err := NewFileSnippetRepo(tempDir)
+	repo, err := NewFileRepo(tempDir)
 	assert.NoError(t, err)
 
 	snippet := &models.Snippet{

@@ -6,19 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"code-playground/cmd/server/domain"
-	"code-playground/cmd/server/usecase"
+	"code-playground/cmd/server/domain/models"
 )
 
 type SnippetHandler struct {
-	uc usecase.SnippetUseCase
+	uc domain.Usecase
 }
 
-func NewSnippetHandler(uc usecase.SnippetUseCase) *SnippetHandler {
+func NewSnippetHandler(uc domain.Usecase) *SnippetHandler {
 	return &SnippetHandler{uc: uc}
 }
 
 func (h *SnippetHandler) FormatSnippet(c *gin.Context) {
-	var req domain.FormatRequest
+	var req models.FormatRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -36,7 +36,7 @@ func (h *SnippetHandler) FormatSnippet(c *gin.Context) {
 }
 
 func (h *SnippetHandler) RunSnippet(c *gin.Context) {
-	var req domain.RunRequest
+	var req models.RunRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

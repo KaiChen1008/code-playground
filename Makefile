@@ -17,7 +17,7 @@ down:
 	docker-compose down
 
 swagger:
-	-docker run --rm -v $$(pwd):/work -w /work quay.io/goswagger/swagger generate model -f api/swagger.yaml -m cmd/server/domain
+	-docker run --rm -v $$(pwd):/work -w /work quay.io/goswagger/swagger generate model -f api/swagger.yaml -m cmd/server/domain/models
 	go fmt ./cmd/server/domain/...
 
 # delete all data files

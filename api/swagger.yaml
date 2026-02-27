@@ -1,0 +1,128 @@
+swagger: "2.0"
+info:
+  title: Code Playground API
+  version: "1.0.0"
+  description: API for running and sharing code snippets (Go, Python, JS, Rust, C++).
+basePath: /api/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /run:
+    post:
+      summary: Run code and save snippet
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/RunRequest"
+      responses:
+        200:
+          description: Execution result and snippet ID
+          schema:
+            $ref: "#/definitions/RunResponse"
+        400:
+          description: Invalid input
+  /format:
+    post:
+      summary: Format code
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/FormatRequest"
+      responses:
+        200:
+          description: Formatted code
+          schema:
+            $ref: "#/definitions/FormatResponse"
+  /snippet/{id}:
+    get:
+      summary: Get code snippet by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Snippet details
+          schema:
+            $ref: "#/definitions/Snippet"
+        404:
+          description: Snippet not found
+    delete:
+      summary: Delete code snippet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        204:
+          description: Deleted successfully
+        404:
+          description: Snippet not found
+  /languages:
+    get:
+      summary: Get supported languages
+      responses:
+        200:
+          description: List of languages and versions
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/LanguageInfo"
+definitions:
+  RunRequest:
+    type: object
+    required: [language, code]
+    properties:
+      id:
+        type: string
+      language:
+        type: string
+        enum: [golang, python, javascript, rust, cpp]
+      code:
+        type: string
+  RunResponse:
+    type: object
+    properties:
+      id:
+        type: string
+      output:
+        type: string
+  FormatRequest:
+    type: object
+    required: [language, code]
+    properties:
+      language:
+        type: string
+      code:
+        type: string
+  FormatResponse:
+    type: object
+    properties:
+      code:
+        type: string
+  Snippet:
+    type: object
+    properties:
+      id:
+        type: string
+      language:
+        type: string
+      code:
+        type: string
+      output:
+        type: string
+  LanguageInfo:
+    type: object
+    properties:
+      name:
+        type: string
+      version:
+        type: string

@@ -1,0 +1,10 @@
+services:
+  server:
+    build: .
+    ports:
+      - "8091:8091"
+    volumes:
+      - ./data:/data
+      - ./config.yaml:/config.yaml
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped

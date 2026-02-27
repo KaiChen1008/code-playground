@@ -1,11 +1,12 @@
 package http
 
 import (
-	"code-playground/cmd/server/domain"
-	"code-playground/cmd/server/usecase"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"code-playground/cmd/server/domain"
+	"code-playground/cmd/server/usecase"
 )
 
 type SnippetHandler struct {
@@ -24,7 +25,7 @@ func (h *SnippetHandler) FormatSnippet(c *gin.Context) {
 	}
 
 	// Validate if possible, though Gin does some binding
-	
+
 	resp, err := h.uc.FormatSnippet(c.Request.Context(), &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

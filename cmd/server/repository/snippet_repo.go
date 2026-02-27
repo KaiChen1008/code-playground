@@ -1,12 +1,13 @@
 package repository
 
 import (
-	"code-playground/cmd/server/domain"
-	"code-playground/pkg/errors"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"code-playground/cmd/server/domain"
+	"code-playground/pkg/errors"
 )
 
 type SnippetRepository interface {

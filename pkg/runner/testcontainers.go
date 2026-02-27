@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"code-playground/pkg/config"
 	"context"
 	"encoding/binary"
 	"fmt"
@@ -12,6 +11,8 @@ import (
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
+
+	"code-playground/pkg/config"
 )
 
 type TestcontainersRunner struct {
@@ -109,11 +110,11 @@ func (r *TestcontainersRunner) Run(ctx context.Context, language, code string) (
 	// but for simplicity we'll just trim it or assume it's clean if we use the right reader.
 	// Actually, the logs from GenericContainer.Logs() are often multiplexed.
 	// Let's use a cleaner way if possible, or just take the whole thing.
-	
+
 	res := string(output)
 	// Trimming the first 8 bytes of each line if it's multiplexed (docker format)
 	// But let's see. If it's a simple run, maybe it's fine.
-	
+
 	return cleanLogs(res), nil
 }
 

@@ -1,14 +1,15 @@
 package http
 
 import (
-	"code-playground/pkg/config"
-	"code-playground/ui"
 	"net/http"
 	"strings"
 	"sync"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"
+
+	"code-playground/pkg/config"
+	"code-playground/ui"
 )
 
 func NewRouter(cfg *config.Config, handler *SnippetHandler) *gin.Engine {

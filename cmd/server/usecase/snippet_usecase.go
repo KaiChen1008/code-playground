@@ -1,14 +1,15 @@
 package usecase
 
 import (
-	"code-playground/cmd/server/domain"
-	"code-playground/cmd/server/repository"
-	"code-playground/pkg/config"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 	"sync/atomic"
+
+	"code-playground/cmd/server/domain"
+	"code-playground/cmd/server/repository"
+	"code-playground/pkg/config"
 )
 
 type SnippetUseCase interface {

@@ -1,13 +1,15 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/sirupsen/logrus"
+
 	"code-playground/cmd/server/delivery/http"
 	"code-playground/cmd/server/repository"
 	"code-playground/cmd/server/usecase"
 	"code-playground/pkg/config"
 	"code-playground/pkg/runner"
-	"fmt"
-	"github.com/sirupsen/logrus"
 )
 
 func main() {

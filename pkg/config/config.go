@@ -2,12 +2,13 @@ package config
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"os"
+
+	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Server    ServerConfig               `mapstructure:"server"`
+	Server    ServerConfig              `mapstructure:"server"`
 	Languages map[string]LanguageConfig `mapstructure:"languages"`
 }
 

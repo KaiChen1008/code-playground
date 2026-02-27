@@ -1,10 +1,12 @@
 package repository
 
 import (
-	"code-playground/cmd/server/domain"
 	"os"
 	"testing"
+
 	"github.com/stretchr/testify/assert"
+
+	"code-playground/cmd/server/domain"
 )
 
 func TestFileSnippetRepository(t *testing.T) {

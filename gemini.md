@@ -1,4 +1,4 @@
-# GEMINI.md - code-playground
+# Gemini.md - code-playground
 
 This project is a self-hosted code execution platform (similar to ideone.com), supporting Go, Python, and JavaScript. It serves as a reference for a full-stack, Clean Architecture implementation in Go.
 

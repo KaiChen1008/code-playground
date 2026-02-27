@@ -1,6 +1,9 @@
 server:
   port: 8091
   data_dir: "./data"
+  rate_limit: 5
+  max_total_submissions: 100
+  max_code_chars: 3000
 
 languages:
   golang:

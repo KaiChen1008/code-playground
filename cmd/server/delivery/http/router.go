@@ -1,16 +1,20 @@
 package http
 
 import (
+	"code-playground/pkg/config"
 	"code-playground/ui"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 )
 
-func NewRouter(handler *SnippetHandler) *gin.Engine {
+func NewRouter(cfg *config.Config, handler *SnippetHandler) *gin.Engine {
 	r := gin.Default()
 	r.Use(corsMiddleware())
+	r.Use(rateLimitMiddleware(cfg.Server.RateLimit))
 
 	v1 := r.Group("/api/v1")
 	{
@@ -24,6 +28,38 @@ func NewRouter(handler *SnippetHandler) *gin.Engine {
 	r.NoRoute(uiHandler())
 
 	return r
+}
+
+func rateLimitMiddleware(limit int) gin.HandlerFunc {
+	type client struct {
+		limiter  *rate.Limiter
+		lastSeen int64
+	}
+	var (
+		mu      sync.Mutex
+		clients = make(map[string]*client)
+	)
+
+	return func(c *gin.Context) {
+		if limit <= 0 {
+			c.Next()
+			return
+		}
+
+		ip := c.ClientIP()
+		mu.Lock()
+		if _, found := clients[ip]; !found {
+			clients[ip] = &client{limiter: rate.NewLimiter(rate.Limit(limit), limit)}
+		}
+		if !clients[ip].limiter.Allow() {
+			mu.Unlock()
+			c.JSON(http.StatusTooManyRequests, gin.H{"error": "Too many requests"})
+			c.Abort()
+			return
+		}
+		mu.Unlock()
+		c.Next()
+	}
 }
 
 func corsMiddleware() gin.HandlerFunc {

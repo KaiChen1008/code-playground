@@ -12,8 +12,11 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Port    int    `mapstructure:"port"`
-	DataDir string `mapstructure:"data_dir"`
+	Port                int    `mapstructure:"port"`
+	DataDir             string `mapstructure:"data_dir"`
+	RateLimit           int    `mapstructure:"rate_limit"`
+	MaxTotalSubmissions int    `mapstructure:"max_total_submissions"`
+	MaxCodeChars        int    `mapstructure:"max_code_chars"`
 }
 
 type LanguageConfig struct {

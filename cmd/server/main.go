@@ -27,7 +27,7 @@ func main() {
 	codeRunner := runner.NewTestcontainersRunner(cfg)
 	uc := usecase.NewSnippetUseCase(repo, codeRunner, cfg)
 	handler := http.NewSnippetHandler(uc)
-	r := http.NewRouter(handler)
+	r := http.NewRouter(cfg, handler)
 
 	port := fmt.Sprintf(":%d", cfg.Server.Port)
 

@@ -13,12 +13,9 @@ import (
 )
 
 func main() {
-	log := logrus.New()
-	log.SetFormatter(&logrus.JSONFormatter{})
-
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("failed to load config: %v", err)
+		logrus.Fatalf("failed to load config: %v", err)
 	}
 	dataDir := cfg.Server.DataDir
 	languages := cfg.Languages
@@ -30,7 +27,7 @@ func main() {
 
 	repo, err := repository.NewFileRepo(dataDir)
 	if err != nil {
-		log.Fatalf("failed to initialize repository: %v", err)
+		logrus.Fatalf("failed to initialize repository: %v", err)
 	}
 
 	codeRunner := runner.NewTestcontainersRunner(languages)
@@ -40,8 +37,8 @@ func main() {
 
 	addr := fmt.Sprintf(":%d", port)
 
-	log.Infof("Server starting on %s", addr)
+	logrus.Infof("Server starting on %s", addr)
 	if err := r.Run(addr); err != nil {
-		log.Fatalf("failed to start server: %v", err)
+		logrus.Fatalf("failed to start server: %v", err)
 	}
 }

@@ -8,14 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"
 
-	"code-playground/pkg/config"
 	"code-playground/ui"
 )
 
-func NewRouter(cfg *config.Config, handler *SnippetHandler) *gin.Engine {
+func NewRouter(rateLimit int, handler *SnippetHandler) *gin.Engine {
 	r := gin.Default()
 	r.Use(corsMiddleware())
-	r.Use(rateLimitMiddleware(cfg.Server.RateLimit))
+	r.Use(rateLimitMiddleware(rateLimit))
 
 	v1 := r.Group("/api/v1")
 	{

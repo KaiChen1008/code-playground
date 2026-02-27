@@ -20,21 +20,27 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)
 	}
+	dataDir := cfg.Server.DataDir
+	languages := cfg.Languages
+	maxCodeChars := cfg.Server.MaxCodeChars
+	maxTotalSubmissions := cfg.Server.MaxTotalSubmissions
+	rateLimit := cfg.Server.RateLimit
+	port := cfg.Server.Port
 
-	repo, err := repository.NewFileSnippetRepository(cfg.Server.DataDir)
+	repo, err := repository.NewFileSnippetRepository(dataDir)
 	if err != nil {
 		log.Fatalf("failed to initialize repository: %v", err)
 	}
 
-	codeRunner := runner.NewTestcontainersRunner(cfg)
-	uc := usecase.NewSnippetUseCase(repo, codeRunner, cfg)
+	codeRunner := runner.NewTestcontainersRunner(languages)
+	uc := usecase.NewSnippetUseCase(repo, codeRunner, maxCodeChars, maxTotalSubmissions, languages)
 	handler := http.NewSnippetHandler(uc)
-	r := http.NewRouter(cfg, handler)
+	r := http.NewRouter(rateLimit, handler)
 
-	port := fmt.Sprintf(":%d", cfg.Server.Port)
+	addr := fmt.Sprintf(":%d", port)
 
-	log.Infof("Server starting on %s", port)
-	if err := r.Run(port); err != nil {
+	log.Infof("Server starting on %s", addr)
+	if err := r.Run(addr); err != nil {
 		log.Fatalf("failed to start server: %v", err)
 	}
 }

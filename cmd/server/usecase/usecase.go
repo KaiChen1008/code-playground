@@ -21,26 +21,34 @@ type SnippetUseCase interface {
 }
 
 type snippetUseCase struct {
-	repo            repository.SnippetRepository
-	runner          CodeRunner
-	cfg             *config.Config
-	submissionCount int64
+	repo                repository.SnippetRepository
+	runner              CodeRunner
+	maxCodeChars        int
+	maxTotalSubmissions int
+	languages           map[string]config.LanguageConfig
+	submissionCount     int64
 }
 
-func NewSnippetUseCase(repo repository.SnippetRepository, runner CodeRunner, cfg *config.Config) SnippetUseCase {
-	return &snippetUseCase{repo: repo, runner: runner, cfg: cfg}
+func NewSnippetUseCase(repo repository.SnippetRepository, runner CodeRunner, maxCodeChars int, maxTotalSubmissions int, languages map[string]config.LanguageConfig) SnippetUseCase {
+	return &snippetUseCase{
+		repo:                repo,
+		runner:              runner,
+		maxCodeChars:        maxCodeChars,
+		maxTotalSubmissions: maxTotalSubmissions,
+		languages:           languages,
+	}
 }
 
 func (uc *snippetUseCase) RunSnippet(ctx context.Context, req *domain.RunRequest) (*domain.RunResponse, error) {
-	if uc.cfg.Server.MaxCodeChars > 0 && req.Code != nil && len(*req.Code) > uc.cfg.Server.MaxCodeChars {
-		return nil, fmt.Errorf("code too long (max %d characters)", uc.cfg.Server.MaxCodeChars)
+	if uc.maxCodeChars > 0 && req.Code != nil && len(*req.Code) > uc.maxCodeChars {
+		return nil, fmt.Errorf("code too long (max %d characters)", uc.maxCodeChars)
 	}
 
-	if uc.cfg.Server.MaxTotalSubmissions > 0 {
+	if uc.maxTotalSubmissions > 0 {
 		count := atomic.AddInt64(&uc.submissionCount, 1)
-		if count > int64(uc.cfg.Server.MaxTotalSubmissions) {
+		if count > int64(uc.maxTotalSubmissions) {
 			atomic.AddInt64(&uc.submissionCount, -1) // revert
-			return nil, fmt.Errorf("server has reached maximum number of submissions (%d)", uc.cfg.Server.MaxTotalSubmissions)
+			return nil, fmt.Errorf("server has reached maximum number of submissions (%d)", uc.maxTotalSubmissions)
 		}
 	}
 
@@ -92,7 +100,7 @@ func (uc *snippetUseCase) FormatSnippet(ctx context.Context, req *domain.FormatR
 
 func (uc *snippetUseCase) GetLanguages(ctx context.Context) ([]domain.LanguageInfo, error) {
 	var languages []domain.LanguageInfo
-	for name, langCfg := range uc.cfg.Languages {
+	for name, langCfg := range uc.languages {
 		languages = append(languages, domain.LanguageInfo{
 			Name:    name,
 			Version: langCfg.Version,

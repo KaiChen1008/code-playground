@@ -16,15 +16,15 @@ import (
 )
 
 type TestcontainersRunner struct {
-	cfg *config.Config
+	languages map[string]config.LanguageConfig
 }
 
-func NewTestcontainersRunner(cfg *config.Config) *TestcontainersRunner {
-	return &TestcontainersRunner{cfg: cfg}
+func NewTestcontainersRunner(languages map[string]config.LanguageConfig) *TestcontainersRunner {
+	return &TestcontainersRunner{languages: languages}
 }
 
 func (r *TestcontainersRunner) Run(ctx context.Context, language, code string) (string, error) {
-	langCfg, ok := r.cfg.Languages[language]
+	langCfg, ok := r.languages[language]
 	if !ok {
 		return "", fmt.Errorf("unsupported language: %s", language)
 	}
@@ -119,7 +119,7 @@ func (r *TestcontainersRunner) Run(ctx context.Context, language, code string) (
 }
 
 func (r *TestcontainersRunner) Format(ctx context.Context, language, code string) (string, error) {
-	langCfg, ok := r.cfg.Languages[language]
+	langCfg, ok := r.languages[language]
 	if !ok {
 		return code, nil
 	}

@@ -33,12 +33,14 @@ The project follows **Clean Architecture** principles to ensure separation of co
 ## 📏 Engineering Standards
 
 ### Coding Style
+
 - **Go**: Follow standard `go fmt` and `go vet`. Use `go mod tidy` before any commit.
 - **Imports**: Group and order imports in this sequence: 1. Built-in (standard library), 2. 3rd-party libraries, 3. Project-local packages. Separate groups with a blank line.
 - **Errors**: Always use the custom wrappers in `pkg/errors` to maintain stack traces and context.
 - **Naming**: Use idiomatic Go naming. Prefer `New` for the primary implementation constructor in its package (e.g., `usecase.New`). For specific implementations in the repository layer, use `New<Type>Repo` (e.g., `repository.NewFileRepo`).
 
 ### Development Workflow
+
 - **API Changes**: Update `api/swagger.yaml` first, then run `make swagger` to regenerate models.
 - **Configuration**: All settings must be defined in `config.yaml` and accessed via `pkg/config`. **Note:** Do not pass the entire configuration object to each struct; pass only the specifically required fields to constructors.
 - **Testing**:

@@ -5,7 +5,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"code-playground/cmd/server/delivery/http"
+	"code-playground/cmd/server/delivery"
 	"code-playground/cmd/server/repository"
 	"code-playground/cmd/server/usecase"
 	"code-playground/pkg/config"
@@ -35,8 +35,8 @@ func main() {
 
 	codeRunner := runner.NewTestcontainersRunner(languages)
 	uc := usecase.New(repo, codeRunner, maxCodeChars, maxTotalSubmissions, languages, maxConcurrentRunners)
-	handler := http.NewSnippetHandler(uc)
-	r := http.NewRouter(rateLimit, handler)
+	handler := delivery.NewSnippetHandler(uc)
+	r := delivery.NewRouter(rateLimit, handler)
 
 	addr := fmt.Sprintf(":%d", port)
 

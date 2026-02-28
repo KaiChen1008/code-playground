@@ -10,6 +10,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 COPY . .
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
     GOBIN=/opt/app/bin \
     go install ./cmd/...
 

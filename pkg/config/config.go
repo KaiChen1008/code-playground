@@ -51,7 +51,6 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
-	// Environment variable overrides (e.g. PORT and DATA_DIR from GEMINI.md)
 	if port := os.Getenv("PORT"); port != "" {
 		fmt.Sscanf(port, "%d", &config.Server.Port)
 	}

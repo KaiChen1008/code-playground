@@ -19,10 +19,6 @@ type Language struct {
 	Version string
 }
 
-func (l Language) String() string {
-	return fmt.Sprintf("%s:%s", l.Image, l.Version)
-}
-
 type TestcontainersRunner struct {
 	languages        map[string]Language
 	executionTimeout time.Duration
@@ -84,7 +80,7 @@ func (r *TestcontainersRunner) Run(ctx context.Context, language, code string) (
 	}
 
 	req := testcontainers.ContainerRequest{
-		Image: langCfg.String(),
+		Image: langCfg.Image,
 		Files: []testcontainers.ContainerFile{
 			{
 				HostFilePath:      filepath.Join(tempDir, filename),

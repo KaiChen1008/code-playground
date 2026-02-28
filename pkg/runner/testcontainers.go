@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -16,14 +17,24 @@ import (
 )
 
 type TestcontainersRunner struct {
-	languages map[string]config.LanguageConfig
+	languages        map[string]config.LanguageConfig
+	executionTimeout time.Duration
 }
 
-func NewTestcontainersRunner(languages map[string]config.LanguageConfig) *TestcontainersRunner {
-	return &TestcontainersRunner{languages: languages}
+func NewTestcontainersRunner(languages map[string]config.LanguageConfig, executionTimeout time.Duration) *TestcontainersRunner {
+	return &TestcontainersRunner{
+		languages:        languages,
+		executionTimeout: executionTimeout,
+	}
 }
 
 func (r *TestcontainersRunner) Run(ctx context.Context, language, code string) (string, error) {
+	if r.executionTimeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, r.executionTimeout)
+		defer cancel()
+	}
+
 	langCfg, ok := r.languages[language]
 	if !ok {
 		return "", fmt.Errorf("unsupported language: %s", language)
@@ -119,6 +130,12 @@ func (r *TestcontainersRunner) Run(ctx context.Context, language, code string) (
 }
 
 func (r *TestcontainersRunner) Format(ctx context.Context, language, code string) (string, error) {
+	if r.executionTimeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, r.executionTimeout)
+		defer cancel()
+	}
+
 	langCfg, ok := r.languages[language]
 	if !ok {
 		return code, nil

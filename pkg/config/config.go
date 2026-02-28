@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -13,12 +14,13 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Port                 int    `mapstructure:"port"`
-	DataDir              string `mapstructure:"data_dir"`
-	RateLimit            int    `mapstructure:"rate_limit"`
-	MaxTotalSubmissions  int    `mapstructure:"max_total_submissions"`
-	MaxCodeChars         int    `mapstructure:"max_code_chars"`
-	MaxConcurrentRunners int    `mapstructure:"max_concurrent_runners"`
+	Port                 int           `mapstructure:"port"`
+	DataDir              string        `mapstructure:"data_dir"`
+	RateLimit            int           `mapstructure:"rate_limit"`
+	MaxTotalSubmissions  int           `mapstructure:"max_total_submissions"`
+	MaxCodeChars         int           `mapstructure:"max_code_chars"`
+	MaxConcurrentRunners int           `mapstructure:"max_concurrent_runners"`
+	ExecutionTimeout     time.Duration `mapstructure:"execution_timeout"`
 }
 
 type LanguageConfig struct {

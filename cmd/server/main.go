@@ -50,16 +50,16 @@ func main() {
 	handler := delivery.NewSnippetHandler(uc)
 	r := delivery.NewRouter(rateLimit, handler)
 
-	// ref: github.com/gin-gonic/examples/tree/master/graceful-shutdown/graceful-shutdown/notify-with-context
-	// create context that listens for the interrupt signal from the OS.
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
-
 	addr := fmt.Sprintf(":%d", port)
 	svr := &http.Server{
 		Addr:    addr,
 		Handler: r,
 	}
+
+	// ref: github.com/gin-gonic/examples/tree/master/graceful-shutdown/graceful-shutdown/notify-with-context
+	// create context that listens for the interrupt signal from the OS.
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
 	svr.BaseContext = func(net.Listener) context.Context {
 		return ctx // for canceling running jobs

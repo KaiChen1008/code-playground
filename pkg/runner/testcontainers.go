@@ -12,16 +12,19 @@ import (
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
-
-	"code-playground/pkg/config"
 )
 
+type Language struct {
+	Image   string
+	Version string
+}
+
 type TestcontainersRunner struct {
-	languages        map[string]config.LanguageConfig
+	languages        map[string]Language
 	executionTimeout time.Duration
 }
 
-func NewTestcontainersRunner(languages map[string]config.LanguageConfig, executionTimeout time.Duration) *TestcontainersRunner {
+func NewTestcontainersRunner(languages map[string]Language, executionTimeout time.Duration) *TestcontainersRunner {
 	return &TestcontainersRunner{
 		languages:        languages,
 		executionTimeout: executionTimeout,

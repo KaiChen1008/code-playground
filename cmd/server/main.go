@@ -37,7 +37,15 @@ func main() {
 		logrus.Fatalf("failed to initialize repository: %v", err)
 	}
 
-	codeRunner := runner.NewTestcontainersRunner(languages, executionTimeout)
+	runnerLangs := make(map[string]runner.Language)
+	for k, v := range languages {
+		runnerLangs[k] = runner.Language{
+			Image:   v.Image,
+			Version: v.Version,
+		}
+	}
+
+	codeRunner := runner.NewTestcontainersRunner(runnerLangs, executionTimeout)
 	uc := usecase.New(repo, codeRunner, maxCodeChars, maxTotalSubmissions, languages, maxConcurrentRunners)
 	handler := delivery.NewSnippetHandler(uc)
 	r := delivery.NewRouter(rateLimit, handler)

@@ -5,6 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>code</title>
+    <script>
+        (function () {
+            const stored = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = stored || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <link rel="icon" href="/favicon.svg?v=123" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -19,6 +27,24 @@
             --ig-blue: #0095f6;
             --ig-red: #ed4956;
             --ig-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            --header-bg: #ffffff;
+            --card-header-bg: #f8f9fa;
+            --editor-bg: #ffffff;
+            --output-text: #262626;
+        }
+
+        :root[data-theme="dark"] {
+            --ig-bg: #0f1116;
+            --ig-card-bg: #171a21;
+            --ig-border: #2a2f3a;
+            --ig-text: #eceff4;
+            --ig-secondary-text: #aab3c5;
+            --ig-blue: #3da9fc;
+            --ig-red: #ff6b7a;
+            --header-bg: #11151d;
+            --card-header-bg: #1c212b;
+            --editor-bg: #131722;
+            --output-text: #dde3ef;
         }
 
         html,
@@ -45,7 +71,7 @@
             align-items: center;
             border-bottom: 1px solid var(--ig-border);
             box-sizing: border-box;
-            background-color: var(--ig-card-bg);
+            background-color: var(--header-bg);
             z-index: 100;
         }
 
@@ -143,7 +169,7 @@
 
         .card-header {
             padding: 12px 16px;
-            background-color: #f8f9fa;
+            background-color: var(--card-header-bg);
             border-bottom: 1px solid var(--ig-border);
             display: flex;
             align-items: center;
@@ -175,7 +201,7 @@
         #editor-container {
             width: 100%;
             height: 100%;
-            background-color: #ffffff;
+            background-color: var(--editor-bg);
         }
 
         #output {
@@ -183,10 +209,10 @@
             margin: 0;
             font-family: 'JetBrains Mono', monospace;
             font-size: 13px;
-            color: #262626;
+            color: var(--output-text);
             white-space: pre-wrap;
             overflow-y: auto;
-            background-color: #ffffff;
+            background-color: var(--editor-bg);
         }
 
         .snippet-info {
@@ -263,6 +289,10 @@
             <select id="language">
                 <!-- Will be populated dynamically -->
             </select>
+            <button id="theme-toggle-btn" class="btn btn-secondary" title="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+                <span>Dark</span>
+            </button>
             <button id="run-btn" class="btn btn-primary"><i class="fas fa-play"></i> <span>Run</span></button>
             <button id="delete-btn" class="btn btn-danger" style="display:none;"><i class="fas fa-trash"></i></button>
         </div>
@@ -299,6 +329,7 @@
         let snippetId = null;
         let originalCode = "";
         let languages = {};
+        let currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
 
         const samples = {
             'python': 'print("Hello, code!")',
@@ -331,10 +362,30 @@
                 }
             });
 
+            monaco.editor.defineTheme('code-dark', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [
+                    { token: 'keyword', foreground: 'ff7b72', fontStyle: 'bold' },
+                    { token: 'comment', foreground: '8b949e', fontStyle: 'italic' },
+                    { token: 'string', foreground: 'a5d6ff' },
+                    { token: 'number', foreground: '79c0ff' },
+                    { token: 'type', foreground: 'd2a8ff' },
+                    { token: 'function', foreground: '79c0ff' }
+                ],
+                colors: {
+                    'editor.background': '#131722',
+                    'editor.lineHighlightBackground': '#1c2230',
+                    'editorCursor.foreground': '#f0f6fc',
+                    'editorIndentGuide.background': '#2d3444',
+                    'editor.selectionBackground': '#388bfd40'
+                }
+            });
+
             editor = monaco.editor.create(document.getElementById('editor-container'), {
                 value: samples['golang'],
                 language: 'go',
-                theme: 'code-light',
+                theme: currentTheme === 'dark' ? 'code-dark' : 'code-light',
                 automaticLayout: true,
                 fontSize: 14,
                 padding: { top: 16 },
@@ -348,6 +399,8 @@
                 cursorSmoothCaretAnimation: "on",
                 cursorBlinking: "smooth"
             });
+
+            updateThemeToggle();
 
             await fetchLanguages();
 
@@ -401,6 +454,7 @@
             });
 
             document.getElementById('format-btn').addEventListener('click', formatCode);
+            document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
 
             document.getElementById('run-btn').addEventListener('click', async () => {
                 const language = document.getElementById('language').value;
@@ -517,6 +571,31 @@
                 info.textContent = '';
                 delBtn.style.display = 'none';
             }
+        }
+
+        function updateThemeToggle() {
+            const btn = document.getElementById('theme-toggle-btn');
+            if (!btn) return;
+            const icon = btn.querySelector('i');
+            const label = btn.querySelector('span');
+            const dark = currentTheme === 'dark';
+            icon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
+            label.textContent = dark ? 'Light' : 'Dark';
+            btn.title = dark ? 'Switch to light mode' : 'Switch to dark mode';
+        }
+
+        function applyTheme(theme) {
+            currentTheme = theme === 'dark' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+            if (window.monaco && monaco.editor) {
+                monaco.editor.setTheme(currentTheme === 'dark' ? 'code-dark' : 'code-light');
+            }
+            updateThemeToggle();
+        }
+
+        function toggleTheme() {
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
         }
     </script>
 </body>

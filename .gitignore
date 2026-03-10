@@ -1,3 +1,7 @@
 data/*.json
 .gemini
 GEMINI.migrate.md
+
+# frontend
+node_modules/
+dist/

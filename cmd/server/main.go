@@ -31,12 +31,6 @@ func main() {
 	rateLimit := cfg.Server.RateLimit
 	port := cfg.Server.Port
 	executionTimeout := cfg.Server.ExecutionTimeout
-
-	repo, err := repository.NewFileRepo(dataDir)
-	if err != nil {
-		logrus.Fatalf("failed to initialize repository: %v", err)
-	}
-
 	runnerLangs := make(map[string]runner.Language)
 	for k, v := range languages {
 		runnerLangs[k] = runner.Language{
@@ -46,6 +40,11 @@ func main() {
 	}
 
 	codeRunner := runner.NewTestcontainersRunner(runnerLangs, executionTimeout)
+
+	repo, err := repository.NewFileRepo(dataDir)
+	if err != nil {
+		logrus.Fatalf("failed to initialize repository: %v", err)
+	}
 	uc := usecase.New(repo, codeRunner, maxCodeChars, maxTotalSubmissions, languages, maxConcurrentRunners)
 	handler := delivery.NewSnippetHandler(uc)
 	r := delivery.NewRouter(rateLimit, handler)

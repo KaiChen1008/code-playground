@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"io/fs"
 	"net/http"
 	"strings"
 	"sync"
@@ -96,7 +97,7 @@ func uiHandler() gin.HandlerFunc {
 			return
 		}
 
-		index, err := ui.Static.ReadFile("index.html")
+		index, err := fs.ReadFile(ui.Static, "index.html")
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load UI"})
 			return

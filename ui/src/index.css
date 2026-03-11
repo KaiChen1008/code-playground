@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ig-bg: #fafafa;
+  --ig-card-bg: #ffffff;
+  --ig-border: #dbdbdb;
+  --ig-text: #262626;
+  --ig-secondary-text: #8e8e8e;
+  --ig-blue: #0095f6;
+  --ig-red: #ed4956;
+  --ig-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  --header-bg: #ffffff;
+  --card-header-bg: #f8f9fa;
+  --editor-bg: #ffffff;
+  --output-text: #262626;
+}
+
+:root[data-theme="dark"] {
+  --ig-bg: #0f1116;
+  --ig-card-bg: #171a21;
+  --ig-border: #2a2f3a;
+  --ig-text: #eceff4;
+  --ig-secondary-text: #aab3c5;
+  --ig-blue: #3da9fc;
+  --ig-red: #ff6b7a;
+  --header-bg: #11151d;
+  --card-header-bg: #1c212b;
+  --editor-bg: #131722;
+  --output-text: #dde3ef;
+}
+
+@layer base {
+  html, body {
+    height: 100%;
+    margin: 0;
+    background-color: var(--ig-bg);
+    color: var(--ig-text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  #root {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}

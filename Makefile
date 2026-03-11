@@ -1,7 +1,20 @@
 IMAGES := $(shell ls cmd)
 
-.PHONY: build run test up down delete clean
-build:
+.PHONY: build run test up down delete clean ui-install ui-dev ui-build ui-lint
+
+ui-install:
+	cd ui && yarn install
+
+ui-dev:
+	cd ui && yarn dev
+
+ui-build:
+	cd ui && yarn build
+
+ui-lint:
+	cd ui && yarn lint
+
+build: ui-build
 	go build -o server ./cmd/server/main.go
 
 run: build

@@ -225,6 +225,62 @@
             font-weight: 600;
         }
 
+        /* Password Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: var(--ig-card-bg);
+            padding: 24px;
+            border-radius: 16px;
+            width: 320px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--ig-border);
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            color: var(--ig-secondary-text);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .modal-input {
+            width: 100%;
+            background-color: var(--ig-bg);
+            color: var(--ig-text);
+            border: 1px solid var(--ig-border);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
         /* Mobile Adjustments */
         @media (max-width: 600px) {
             header {
@@ -293,6 +349,16 @@
                 <i class="fas fa-moon"></i>
                 <span>Dark</span>
             </button>
+            <div id="password-wrapper" style="display:none; align-items:center; gap:4px;">
+                <input type="password" id="snippet-password" placeholder="Set password" 
+                    style="background-color:var(--ig-bg); color:var(--ig-text); border:1px solid var(--ig-border); padding:6px 12px; border-radius:8px; font-size:14px; outline:none; width:100px;">
+                <button id="show-password-btn" class="btn btn-secondary" style="padding: 7px 10px;" title="Show password">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <button id="lock-btn" class="btn btn-secondary" title="Set password">
+                <span>Password</span>
+            </button>
             <button id="run-btn" class="btn btn-primary"><i class="fas fa-play"></i> <span>Run</span></button>
             <button id="delete-btn" class="btn btn-danger" style="display:none;"><i class="fas fa-trash"></i></button>
         </div>
@@ -321,6 +387,24 @@
             <pre id="output">Welcome to code. Write code and press Run.</pre>
         </div>
     </main>
+
+    <div id="password-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Password Required</h3>
+            <p>This snippet is protected. Please enter the password to view it.</p>
+            <div id="modal-error" style="color:var(--ig-red); font-size:12px; margin-bottom:10px; display:none;">Invalid password</div>
+            <div style="position:relative; margin-bottom: 20px;">
+                <input type="password" id="modal-password-input" placeholder="Enter password" class="modal-input" style="margin-bottom:0;">
+                <button id="modal-show-password-btn" class="btn btn-secondary" style="position:absolute; right:4px; top:4px; border:none; background:transparent;">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <div class="modal-actions">
+                <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+                <button id="modal-submit-btn" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs' } });
@@ -456,14 +540,40 @@
             document.getElementById('format-btn').addEventListener('click', formatCode);
             document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
 
+            document.getElementById('lock-btn').addEventListener('click', () => {
+                const wrapper = document.getElementById('password-wrapper');
+                const lockBtn = document.getElementById('lock-btn');
+                const isHidden = wrapper.style.display === 'none';
+                wrapper.style.display = isHidden ? 'flex' : 'none';
+                lockBtn.querySelector('span').textContent = isHidden ? 'Cancel' : 'Password';
+                lockBtn.className = isHidden ? 'btn btn-primary' : 'btn btn-secondary';
+                if (isHidden) document.getElementById('snippet-password').focus();
+            });
+
+            const setupShowPassword = (btnId, inputId) => {
+                const btn = document.getElementById(btnId);
+                const input = document.getElementById(inputId);
+                btn.addEventListener('click', () => {
+                    const isPassword = input.type === 'password';
+                    input.type = isPassword ? 'text' : 'password';
+                    btn.innerHTML = isPassword ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+                });
+            };
+
+            setupShowPassword('show-password-btn', 'snippet-password');
+            setupShowPassword('modal-show-password-btn', 'modal-password-input');
+
             document.getElementById('run-btn').addEventListener('click', async () => {
                 const language = document.getElementById('language').value;
                 const code = editor.getValue();
+                const password = document.getElementById('snippet-password').value;
                 const outputEl = document.getElementById('output');
                 outputEl.textContent = 'Running...';
 
                 const body = { language, code };
-                if (snippetId && code === originalCode) {
+                if (password) {
+                    body.password = password;
+                } else if (snippetId && code === originalCode) {
                     body.id = snippetId;
                 }
 
@@ -483,11 +593,41 @@
                             originalCode = code;
                             history.pushState(null, '', `/${snippetId}`);
                             updateSnippetInfo();
+                            // Reset password field
+                            document.getElementById('snippet-password').value = '';
+                            document.getElementById('password-wrapper').style.display = 'none';
+                            const lockBtn = document.getElementById('lock-btn');
+                            lockBtn.querySelector('span').textContent = 'Password';
+                            lockBtn.className = 'btn btn-secondary';
+                            // Reset input type and icon
+                            const pwdInput = document.getElementById('snippet-password');
+                            pwdInput.type = 'password';
+                            const showBtn = document.getElementById('show-password-btn');
+                            showBtn.innerHTML = '<i class="fas fa-eye"></i>';
                         }
                     }
                 } catch (err) {
                     outputEl.textContent = 'Error: ' + err.message;
                 }
+            });
+
+            document.getElementById('modal-cancel-btn').addEventListener('click', () => {
+                document.getElementById('password-modal').style.display = 'none';
+                history.pushState(null, '', '/');
+                snippetId = null;
+                updateSnippetInfo();
+            });
+
+            document.getElementById('modal-submit-btn').addEventListener('click', () => {
+                const password = document.getElementById('modal-password-input').value;
+                if (password) {
+                    document.getElementById('password-modal').style.display = 'none';
+                    loadSnippet(snippetId, password);
+                }
+            });
+
+            document.getElementById('modal-password-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') document.getElementById('modal-submit-btn').click();
             });
 
             document.getElementById('delete-btn').addEventListener('click', async () => {
@@ -533,9 +673,14 @@
             document.getElementById('display-ver').textContent = ver ? `(${ver})` : "";
         }
 
-        async function loadSnippet(id) {
+        async function loadSnippet(id, password = "") {
             try {
-                const resp = await fetch(`/api/v1/snippet/${id}`);
+                const url = `/api/v1/snippet/${id}`;
+                const resp = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
                 if (resp.ok) {
                     const data = await resp.json();
                     snippetId = data.id;
@@ -555,6 +700,17 @@
                     }
 
                     updateSnippetInfo();
+                } else if (resp.status === 401) {
+                    snippetId = id;
+                    const errorEl = document.getElementById('modal-error');
+                    if (password) {
+                        errorEl.style.display = 'block';
+                        document.getElementById('modal-password-input').value = '';
+                    } else {
+                        errorEl.style.display = 'none';
+                    }
+                    document.getElementById('password-modal').style.display = 'flex';
+                    document.getElementById('modal-password-input').focus();
                 }
             } catch (err) {
                 console.error('Failed to load snippet', err);

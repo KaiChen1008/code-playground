@@ -40,18 +40,25 @@ paths:
           schema:
             $ref: "#/definitions/FormatResponse"
   /snippet/{id}:
-    get:
-      summary: Get code snippet by ID
+    post:
+      summary: Get code snippet by ID (with optional password)
       parameters:
         - name: id
           in: path
           required: true
           type: string
+        - in: body
+          name: body
+          required: false
+          schema:
+            $ref: "#/definitions/GetSnippetRequest"
       responses:
         200:
           description: Snippet details
           schema:
             $ref: "#/definitions/Snippet"
+        401:
+          description: Incorrect password
         404:
           description: Snippet not found
     delete:
@@ -88,6 +95,8 @@ definitions:
         enum: [golang, python, javascript, rust, cpp]
       code:
         type: string
+      password:
+        type: string
   RunResponse:
     type: object
     properties:
@@ -119,10 +128,19 @@ definitions:
         type: string
       output:
         type: string
+      has_password:
+        type: boolean
+      password_hash:
+        type: string
   LanguageInfo:
     type: object
     properties:
       name:
         type: string
       version:
+        type: string
+  GetSnippetRequest:
+    type: object
+    properties:
+      password:
         type: string

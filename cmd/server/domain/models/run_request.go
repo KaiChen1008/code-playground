@@ -31,6 +31,9 @@ type RunRequest struct {
 	// Required: true
 	// Enum: ["golang","python","javascript","rust","cpp"]
 	Language *string `json:"language"`
+
+	// password
+	Password string `json:"password,omitempty"`
 }
 
 // Validate validates this run request

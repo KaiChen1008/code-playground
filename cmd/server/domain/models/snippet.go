@@ -20,6 +20,9 @@ type Snippet struct {
 	// code
 	Code string `json:"code,omitempty"`
 
+	// has password
+	HasPassword bool `json:"has_password,omitempty"`
+
 	// id
 	ID string `json:"id,omitempty"`
 
@@ -28,6 +31,9 @@ type Snippet struct {
 
 	// output
 	Output string `json:"output,omitempty"`
+
+	// password hash
+	PasswordHash string `json:"password_hash,omitempty"`
 }
 
 // Validate validates this snippet

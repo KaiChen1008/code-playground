@@ -60,7 +60,7 @@ The project follows **Clean Architecture** principles to ensure separation of co
 - `make run`: Builds and executes the server locally.
 - `make test`: Runs the full test suite.
 - `make up`: Starts the entire stack (API + Infrastructure) via Docker Compose.
-- `make swagger`: Regenerates the `domain` models from the OpenAPI spec.
+- `make generate`: Regenerates the `domain` models from the OpenAPI spec.
 
 ## 🛑 Quality Gate (Before Stop)
 

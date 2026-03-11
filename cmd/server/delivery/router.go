@@ -20,7 +20,7 @@ func NewRouter(rateLimit int, handler *SnippetHandler) *gin.Engine {
 	{
 		v1.POST("/run", handler.RunSnippet)
 		v1.POST("/format", handler.FormatSnippet)
-		v1.GET("/snippet/:id", handler.GetSnippet)
+		v1.POST("/snippet/:id", handler.GetSnippet)
 		v1.DELETE("/snippet/:id", handler.DeleteSnippet)
 		v1.GET("/languages", handler.GetLanguages)
 	}

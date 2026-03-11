@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"sync/atomic"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"code-playground/cmd/server/domain"
 	"code-playground/cmd/server/domain/models"
 	"code-playground/pkg/config"
@@ -80,6 +82,15 @@ func (uc *usecase) RunSnippet(ctx context.Context, req *models.RunRequest) (*mod
 			Output:   output,
 		}
 
+		if req.Password != "" {
+			hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+			if err != nil {
+				return nil, fmt.Errorf("failed to hash password: %w", err)
+			}
+			snippet.HasPassword = true
+			snippet.PasswordHash = string(hash)
+		}
+
 		if err := uc.repo.Save(snippet); err != nil {
 			return nil, fmt.Errorf("failed to save snippet: %w", err)
 		}
@@ -91,8 +102,24 @@ func (uc *usecase) RunSnippet(ctx context.Context, req *models.RunRequest) (*mod
 	}, nil
 }
 
-func (uc *usecase) GetSnippet(ctx context.Context, id string) (*models.Snippet, error) {
-	return uc.repo.GetByID(id)
+func (uc *usecase) GetSnippet(ctx context.Context, id, password string) (*models.Snippet, error) {
+	snippet, err := uc.repo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if snippet.HasPassword {
+		if password == "" {
+			return nil, fmt.Errorf("password required")
+		}
+		if err := bcrypt.CompareHashAndPassword([]byte(snippet.PasswordHash), []byte(password)); err != nil {
+			return nil, fmt.Errorf("invalid password")
+		}
+	}
+
+	// Never return the password hash to the client
+	snippet.PasswordHash = ""
+	return snippet, nil
 }
 
 func (uc *usecase) DeleteSnippet(ctx context.Context, id string) error {

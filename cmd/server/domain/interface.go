@@ -8,7 +8,7 @@ import (
 
 type Usecase interface {
 	RunSnippet(ctx context.Context, req *models.RunRequest) (*models.RunResponse, error)
-	GetSnippet(ctx context.Context, id string) (*models.Snippet, error)
+	GetSnippet(ctx context.Context, id, password string) (*models.Snippet, error)
 	DeleteSnippet(ctx context.Context, id string) error
 	FormatSnippet(ctx context.Context, req *models.FormatRequest) (*models.FormatResponse, error)
 	GetLanguages(ctx context.Context) ([]models.LanguageInfo, error)

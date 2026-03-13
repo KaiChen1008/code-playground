@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/docker/docker/api/types/container"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
@@ -165,6 +166,12 @@ func (r *TestcontainersRunner) Format(ctx context.Context, language, code string
 
 	req := testcontainers.ContainerRequest{
 		Image: image,
+		HostConfigModifier: func(hc *container.HostConfig) {
+			hc.Resources = container.Resources{
+				Memory:   128 * 1024 * 1024, // 128 MB
+				NanoCPUs: 1 * 1e9,           // 0.1 cpu
+			}
+		},
 		Files: []testcontainers.ContainerFile{
 			{
 				HostFilePath:      filepath.Join(tempDir, filename),

@@ -57,6 +57,7 @@
     </script>
     <link rel="icon" href="/favicon.svg?v=123" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.js"></script>
     <style>
@@ -137,15 +138,72 @@
             align-items: center;
         }
 
-        select {
+        /* Custom Dropdown */
+        .custom-select {
+            position: relative;
+            min-width: 140px;
+            user-select: none;
+        }
+
+        .select-trigger {
             background-color: var(--ig-bg);
             color: var(--ig-text);
             border: 1px solid var(--ig-border);
             padding: 6px 12px;
             border-radius: 8px;
             font-size: 14px;
-            outline: none;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .select-options {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            width: 100%;
+            background-color: var(--ig-card-bg);
+            border: 1px solid var(--ig-border);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .select-options.active {
+            display: flex;
+        }
+
+        .select-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .select-option:hover {
+            background-color: var(--ig-bg);
+        }
+
+        .select-option i {
+            font-size: 16px;
+        }
+
+        .lang-icon-go { color: #00add8; }
+        .lang-icon-python { color: #3776ab; }
+        .lang-icon-javascript { color: #f7df1e; }
+        .lang-icon-rust { color: #dea584; }
+        .lang-icon-cpp { color: #00599c; }
+
+        select {
+            display: none;
         }
 
         .btn {
@@ -514,8 +572,20 @@
     <header>
         <h1 class="logo" onclick="window.location.href='/'" style="margin:0;">PolyRun</h1>
         <div class="controls">
+            <div class="custom-select" id="custom-language-select">
+                <div class="select-trigger">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i id="selected-icon" class="devicon-go-plain lang-icon-go"></i>
+                        <span id="selected-name">Golang</span>
+                    </div>
+                    <i class="fas fa-chevron-down" style="font-size:10px; opacity:0.5;"></i>
+                </div>
+                <div class="select-options" id="select-options-list">
+                    <!-- Options populated by JS -->
+                </div>
+            </div>
             <select id="language">
-                <!-- Will be populated dynamically -->
+                <!-- Keep hidden for script compatibility -->
             </select>
             <button id="theme-toggle-btn" class="btn btn-secondary" title="Toggle dark mode">
                 <i class="fas fa-moon"></i>
@@ -653,6 +723,13 @@
         };
 
         const extensions = { 'golang': 'go', 'python': 'py', 'javascript': 'js', 'rust': 'rs', 'cpp': 'cpp' };
+        const langIcons = {
+            'python': 'devicon-python-plain lang-icon-python',
+            'javascript': 'devicon-javascript-plain lang-icon-javascript',
+            'golang': 'devicon-go-plain lang-icon-go',
+            'rust': 'devicon-rust-plain lang-icon-rust',
+            'cpp': 'devicon-cplusplus-plain lang-icon-cpp'
+        };
 
         require(['vs/editor/editor.main'], async function () {
             monaco.editor.defineTheme('code-light', {
@@ -795,6 +872,16 @@
                 monaco.editor.setModelLanguage(model, monacoLang);
 
                 updateLanguageDisplay(lang);
+            });
+
+            document.getElementById('custom-language-select').addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('select-options-list').classList.toggle('active');
+            });
+
+            document.addEventListener('click', () => {
+                const list = document.getElementById('select-options-list');
+                if (list) list.classList.remove('active');
             });
 
             document.getElementById('format-btn').addEventListener('click', formatCode);
@@ -946,18 +1033,52 @@
                 const resp = await fetch('/api/v1/languages');
                 const data = await resp.json();
                 const select = document.getElementById('language');
+                const optionsList = document.getElementById('select-options-list');
+                
                 select.innerHTML = '';
+                optionsList.innerHTML = '';
+
                 data.forEach(lang => {
                     languages[lang.name] = lang.version;
+                    
                     const option = document.createElement('option');
                     option.value = lang.name;
-                    option.textContent = lang.name.charAt(0).toUpperCase() + lang.name.slice(1);
+                    option.textContent = lang.name;
                     if (lang.name === 'golang') option.selected = true;
                     select.appendChild(option);
+
+                    const customOption = document.createElement('div');
+                    customOption.className = 'select-option';
+                    const iconClass = langIcons[lang.name] || 'fas fa-file-code';
+                    const displayName = lang.name === 'golang' ? 'Golang' : lang.name.charAt(0).toUpperCase() + lang.name.slice(1);
+                    
+                    customOption.innerHTML = `
+                        <i class="${iconClass}"></i>
+                        <span>${displayName}</span>
+                    `;
+
+                    customOption.onclick = (e) => {
+                        e.stopPropagation();
+                        select.value = lang.name;
+                        select.dispatchEvent(new Event('change'));
+                        updateCustomSelectDisplay(lang.name);
+                        optionsList.classList.remove('active');
+                    };
+
+                    optionsList.appendChild(customOption);
                 });
             } catch (err) {
                 console.error('Failed to fetch languages', err);
             }
+        }
+
+        function updateCustomSelectDisplay(lang) {
+            const iconClass = langIcons[lang] || 'fas fa-file-code';
+            const displayName = lang === 'golang' ? 'Golang' : lang.charAt(0).toUpperCase() + lang.slice(1);
+            const nameEl = document.getElementById('selected-name');
+            const iconEl = document.getElementById('selected-icon');
+            if (nameEl) nameEl.textContent = displayName;
+            if (iconEl) iconEl.className = iconClass;
         }
 
         function updateLanguageDisplay(lang) {
@@ -965,6 +1086,7 @@
             document.getElementById('display-lang').textContent = `main.${ext}`;
             const ver = languages[lang] || "";
             document.getElementById('display-ver').textContent = ver ? `(${ver})` : "";
+            updateCustomSelectDisplay(lang);
         }
 
         async function loadSnippet(id, password = "") {

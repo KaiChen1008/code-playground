@@ -5,3 +5,6 @@ GEMINI.migrate.md
 # frontend
 node_modules/
 dist/
+
+# build
+server

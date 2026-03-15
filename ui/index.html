@@ -111,6 +111,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 20px;
             border-bottom: 1px solid var(--ig-border);
             box-sizing: border-box;
             background-color: var(--header-bg);
@@ -158,6 +159,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            white-space: nowrap;
         }
 
         .btn:active {
@@ -528,6 +530,7 @@
                 </button>
             </div>
             <button id="lock-btn" class="btn btn-secondary" title="Set password">
+                <i class="fas fa-lock"></i>
                 <span>Password</span>
             </button>
             <button id="share-btn" class="btn btn-secondary" style="display:none;" title="Share/Embed snippet">
@@ -825,6 +828,7 @@
                 const isHidden = wrapper.style.display === 'none';
                 wrapper.style.display = isHidden ? 'flex' : 'none';
                 lockBtn.querySelector('span').textContent = isHidden ? 'Cancel' : 'Password';
+                lockBtn.querySelector('i').className = isHidden ? 'fas fa-times' : 'fas fa-lock';
                 lockBtn.className = isHidden ? 'btn btn-primary' : 'btn btn-secondary';
                 if (isHidden) document.getElementById('snippet-password').focus();
             });
@@ -877,6 +881,7 @@
                             document.getElementById('password-wrapper').style.display = 'none';
                             const lockBtn = document.getElementById('lock-btn');
                             lockBtn.querySelector('span').textContent = 'Password';
+                            lockBtn.querySelector('i').className = 'fas fa-lock';
                             lockBtn.className = 'btn btn-secondary';
                             // Reset input type and icon
                             const pwdInput = document.getElementById('snippet-password');

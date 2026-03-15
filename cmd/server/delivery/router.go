@@ -6,6 +6,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"
 
@@ -15,6 +16,7 @@ import (
 
 func NewRouter(rateLimit int, handler *SnippetHandler, uc domain.Usecase) *gin.Engine {
 	r := gin.Default()
+	r.Use(gzip.Gzip(gzip.DefaultCompression))
 	r.Use(corsMiddleware())
 	r.Use(rateLimitMiddleware(rateLimit))
 
@@ -89,6 +91,8 @@ func uiHandler(uc domain.Usecase) gin.HandlerFunc {
 		}
 
 		if _, err := ui.Static.Open(path[1:]); err == nil {
+			// Cache static files (icons, favicon, sitemap)
+			c.Header("Cache-Control", "public, max-age=31536000, immutable")
 			fileServer.ServeHTTP(c.Writer, c.Request)
 			return
 		}

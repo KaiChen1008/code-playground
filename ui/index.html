@@ -20,7 +20,7 @@
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    
+
     <link rel="canonical" href="https://polyrun.kaichenl.com">
 
     <!-- Open Graph / Facebook -->
@@ -56,13 +56,17 @@
       "featureList": "Multi-language support, Docker isolation, Syntax highlighting, Shareable snippets"
     }
     </script>
-    
+
     <!-- Preload Critical Assets & Defer loading non-critical CSS -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.js" as="script">
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" media="print" onload="this.media='all'">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" media="print"
+        onload="this.media='all'">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"
+        media="print" onload="this.media='all'">
 
     <script>
         (function () {
@@ -72,6 +76,10 @@
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>
+    <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+        data-id="kaichen1008" data-description="Support me on Buy me a coffee!" data-message="" data-color="#FF5F5F"
+        data-position="Right" data-x_margin="18" data-y_margin="18">
+        </script>
     <link rel="icon" href="/favicon.svg?v=123" type="image/svg+xml">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.js"></script>
     <style>
@@ -181,7 +189,7 @@
             background-color: var(--ig-card-bg);
             border: 1px solid var(--ig-border);
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             display: none;
             flex-direction: column;
             overflow: hidden;
@@ -210,11 +218,25 @@
             font-size: 16px;
         }
 
-        .lang-icon-go { color: #00add8; }
-        .lang-icon-python { color: #3776ab; }
-        .lang-icon-javascript { color: #f7df1e; }
-        .lang-icon-rust { color: #dea584; }
-        .lang-icon-cpp { color: #00599c; }
+        .lang-icon-go {
+            color: #00add8;
+        }
+
+        .lang-icon-python {
+            color: #3776ab;
+        }
+
+        .lang-icon-javascript {
+            color: #f7df1e;
+        }
+
+        .lang-icon-rust {
+            color: #dea584;
+        }
+
+        .lang-icon-cpp {
+            color: #00599c;
+        }
 
         select {
             display: none;
@@ -953,7 +975,7 @@
                 const password = document.getElementById('snippet-password').value;
                 const outputEl = document.getElementById('output');
                 const runBtn = document.getElementById('run-btn');
-                
+
                 // Set loading state
                 const originalBtnContent = runBtn.innerHTML;
                 runBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Running...</span>';
@@ -1048,13 +1070,13 @@
                 const data = await resp.json();
                 const select = document.getElementById('language');
                 const optionsList = document.getElementById('select-options-list');
-                
+
                 select.innerHTML = '';
                 optionsList.innerHTML = '';
 
                 data.forEach(lang => {
                     languages[lang.name] = lang.version;
-                    
+
                     const option = document.createElement('option');
                     option.value = lang.name;
                     option.textContent = lang.name;
@@ -1065,7 +1087,7 @@
                     customOption.className = 'select-option';
                     const iconClass = langIcons[lang.name] || 'fas fa-file-code';
                     const displayName = lang.name === 'golang' ? 'Golang' : lang.name.charAt(0).toUpperCase() + lang.name.slice(1);
-                    
+
                     customOption.innerHTML = `
                         <i class="${iconClass}"></i>
                         <span>${displayName}</span>

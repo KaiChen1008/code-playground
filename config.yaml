@@ -1,8 +1,8 @@
 server:
   port: 8091
   data_dir: "./data"
-  rate_limit: 5
-  max_total_submissions: 100
+  rate_limit: 20
+  max_total_submissions: 1000
   max_code_chars: 3000
   max_concurrent_runners: 10
   execution_timeout: "3m"

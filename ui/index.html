@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PolyRun - Online Code Runner & Playground (Go, Python, JS)</title>
-    <meta name="description" content="PolyRun is a secure, minimalist online code runner and playground. Write, compile, and execute Go, Python, and JavaScript code instantly in your browser. Self-hosted and docker-isolated.">
-    <meta name="keywords" content="online code runner, go playground, python online compiler, javascript playground, run code online, secure code execution, polyrun">
+    <meta name="description"
+        content="PolyRun is a secure, minimalist online code runner and playground. Write, compile, and execute Go, Python, and JavaScript code instantly in your browser. Self-hosted and docker-isolated.">
+    <meta name="keywords"
+        content="online code runner, go playground, python online compiler, javascript playground, run code online, secure code execution, polyrun">
     <meta name="author" content="PolyRun">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://polyrun.kaichenl.com">
@@ -15,14 +17,16 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://polyrun.kaichenl.com/">
     <meta property="og:title" content="PolyRun - Online Code Runner & Playground">
-    <meta property="og:description" content="Secure, minimalist online code runner. Execute Go, Python, and JavaScript instantly.">
+    <meta property="og:description"
+        content="Secure, minimalist online code runner. Execute Go, Python, and JavaScript instantly.">
     <meta property="og:image" content="https://polyrun.kaichenl.com/favicon.svg">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary">
     <meta property="twitter:url" content="https://polyrun.kaichenl.com/">
     <meta property="twitter:title" content="PolyRun - Online Code Runner">
-    <meta property="twitter:description" content="Secure, minimalist online code runner. Execute Go, Python, and JavaScript instantly.">
+    <meta property="twitter:description"
+        content="Secure, minimalist online code runner. Execute Go, Python, and JavaScript instantly.">
     <meta property="twitter:image" content="https://polyrun.kaichenl.com/favicon.svg">
 
     <!-- Structured Data -->
@@ -189,6 +193,7 @@
 
         .editor-card {
             height: 500px;
+            min-height: 0;
         }
 
         .card {
@@ -198,6 +203,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            min-height: 0;
         }
 
         .output-card {
@@ -285,6 +291,48 @@
             box-sizing: border-box;
         }
 
+        body.embed-mode {
+            background-color: var(--ig-bg);
+            overflow: hidden;
+        }
+
+        body.embed-mode header,
+        body.embed-mode .info-section,
+        body.embed-mode .site-footer {
+            display: none !important;
+        }
+
+        body.embed-mode main {
+            padding: 10px;
+            max-width: 100%;
+            height: 100%;
+            overflow: hidden;
+            gap: 10px;
+        }
+
+        body.embed-mode .editor-card {
+            flex: 3;
+            height: auto;
+            min-height: 0;
+        }
+
+        body.embed-mode .output-card {
+            flex: 1;
+            min-height: 0;
+            height: auto;
+        }
+
+        body.embed-mode #theme-toggle-btn,
+        body.embed-mode #lock-btn,
+        body.embed-mode #share-btn,
+        body.embed-mode #delete-btn {
+            display: none !important;
+        }
+
+        body.hide-output .output-card {
+            display: none !important;
+        }
+
         .user-avatar {
             width: 32px;
             height: 32px;
@@ -300,13 +348,16 @@
 
         #editor-container {
             width: 100%;
-            height: 100%;
+            flex: 1;
+            min-height: 0;
             background-color: var(--editor-bg);
         }
 
         #output {
             padding: 16px;
             margin: 0;
+            flex: 1;
+            min-height: 0;
             font-family: 'JetBrains Mono', monospace;
             font-size: 13px;
             color: var(--output-text);
@@ -468,14 +519,19 @@
                 <span>Dark</span>
             </button>
             <div id="password-wrapper" style="display:none; align-items:center; gap:4px;">
-                <input type="password" id="snippet-password" placeholder="Set password" 
+                <input type="password" id="snippet-password" placeholder="Set password"
                     style="background-color:var(--ig-bg); color:var(--ig-text); border:1px solid var(--ig-border); padding:6px 12px; border-radius:8px; font-size:14px; outline:none; width:100px;">
-                <button id="show-password-btn" class="btn btn-secondary" style="padding: 7px 10px;" title="Show password">
+                <button id="show-password-btn" class="btn btn-secondary" style="padding: 7px 10px;"
+                    title="Show password">
                     <i class="fas fa-eye"></i>
                 </button>
             </div>
             <button id="lock-btn" class="btn btn-secondary" title="Set password">
                 <span>Password</span>
+            </button>
+            <button id="share-btn" class="btn btn-secondary" style="display:none;" title="Share/Embed snippet">
+                <i class="fas fa-share-nodes"></i>
+                <span>Share</span>
             </button>
             <button id="run-btn" class="btn btn-primary"><i class="fas fa-play"></i> <span>Run</span></button>
             <button id="delete-btn" class="btn btn-danger" style="display:none;"><i class="fas fa-trash"></i></button>
@@ -508,7 +564,11 @@
         <section class="info-section">
             <div class="footer-card">
                 <h2>About PolyRun</h2>
-                <p>PolyRun is a high-performance <strong>online code runner</strong> and <strong>playground</strong>. We provide a secure environment for developers to quickly test and share code snippets in <strong>Go (Golang)</strong>, <strong>Python</strong>, <strong>JavaScript (Node.js)</strong>, <strong>Rust</strong>, and <strong>C++</strong>. Our goal is to offer a minimalist, fast, and accessible alternative to traditional IDEs for rapid prototyping and educational purposes.</p>
+                <p>PolyRun is a high-performance <strong>online code runner</strong> and <strong>playground</strong>. We
+                    provide a secure environment for developers to quickly test and share code snippets in <strong>Go
+                        (Golang)</strong>, <strong>Python</strong>, <strong>JavaScript (Node.js)</strong>,
+                    <strong>Rust</strong>, and <strong>C++</strong>. Our goal is to offer a minimalist, fast, and
+                    accessible alternative to traditional IDEs for rapid prototyping and educational purposes.</p>
             </div>
             <div class="footer-card">
                 <h2>PolyRun Features</h2>
@@ -528,16 +588,41 @@
         <div class="modal-content">
             <h3>Password Required</h3>
             <p>This snippet is protected. Please enter the password to view it.</p>
-            <div id="modal-error" style="color:var(--ig-red); font-size:12px; margin-bottom:10px; display:none;">Invalid password</div>
+            <div id="modal-error" style="color:var(--ig-red); font-size:12px; margin-bottom:10px; display:none;">Invalid
+                password</div>
             <div style="position:relative; margin-bottom: 20px;">
-                <input type="password" id="modal-password-input" placeholder="Enter password" class="modal-input" style="margin-bottom:0;">
-                <button id="modal-show-password-btn" class="btn btn-secondary" style="position:absolute; right:4px; top:4px; border:none; background:transparent;">
+                <input type="password" id="modal-password-input" placeholder="Enter password" class="modal-input"
+                    style="margin-bottom:0;">
+                <button id="modal-show-password-btn" class="btn btn-secondary"
+                    style="position:absolute; right:4px; top:4px; border:none; background:transparent;">
                     <i class="fas fa-eye"></i>
                 </button>
             </div>
             <div class="modal-actions">
                 <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
                 <button id="modal-submit-btn" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="share-modal" class="modal-overlay">
+        <div class="modal-content" style="width: 400px;">
+            <h3>Share Snippet</h3>
+            <p>Copy the iframe code below to embed this snippet into your website or blog.</p>
+            <div style="margin-bottom: 20px;">
+                <label style="font-size:12px; font-weight:600; margin-bottom:4px; display:block;">Embed Code</label>
+                <div style="position:relative;">
+                    <textarea id="embed-code-input" readonly class="modal-input"
+                        style="height: 80px; resize:none; font-family: 'JetBrains Mono', monospace; font-size:12px; padding-right:40px;"></textarea>
+                    <button id="copy-embed-btn" class="btn btn-secondary"
+                        style="position:absolute; right:4px; top:4px; border:none; background:transparent;"
+                        title="Copy to clipboard">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="share-close-btn" class="btn btn-primary">Close</button>
             </div>
         </div>
     </div>
@@ -616,7 +701,9 @@
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
                 scrollbar: {
-                    alwaysConsumeMouseWheel: false
+                    alwaysConsumeMouseWheel: false,
+                    vertical: 'auto',
+                    horizontal: 'auto'
                 },
                 lineNumbers: 'on',
                 renderLineHighlight: 'all',
@@ -631,9 +718,24 @@
 
             await fetchLanguages();
 
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('embed') === 'true') {
+                document.body.classList.add('embed-mode');
+                const themeParam = params.get('theme');
+                if (themeParam === 'dark') {
+                    applyTheme('dark', false);
+                } else if (themeParam === 'light') {
+                    applyTheme('light', false);
+                } else {
+                    // Default to light for embeds if not specified
+                    applyTheme('light', false);
+                }
+                if (params.get('output') === 'false') document.body.classList.add('hide-output');
+            }
+
             const path = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
             const supportedLangs = ['python', 'go', 'golang', 'javascript', 'rust', 'cpp'];
-            
+
             if (supportedLangs.includes(path)) {
                 const lang = path === 'go' ? 'golang' : path;
                 document.getElementById('language').value = lang;
@@ -693,6 +795,28 @@
 
             document.getElementById('format-btn').addEventListener('click', formatCode);
             document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
+
+            document.getElementById('share-btn').addEventListener('click', () => {
+                if (!snippetId) return;
+                const embedURL = `${window.location.origin}/${snippetId}?embed=true`;
+                const embedCode = `<iframe src="${embedURL}" width="100%" height="500px" frameborder="0"></iframe>`;
+                document.getElementById('embed-code-input').value = embedCode;
+                document.getElementById('share-modal').style.display = 'flex';
+            });
+
+            document.getElementById('share-close-btn').addEventListener('click', () => {
+                document.getElementById('share-modal').style.display = 'none';
+            });
+
+            document.getElementById('copy-embed-btn').addEventListener('click', () => {
+                const input = document.getElementById('embed-code-input');
+                input.select();
+                document.execCommand('copy');
+                const btn = document.getElementById('copy-embed-btn');
+                const oldIcon = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check" style="color:var(--ig-blue);"></i>';
+                setTimeout(() => { btn.innerHTML = oldIcon; }, 2000);
+            });
 
             document.getElementById('lock-btn').addEventListener('click', () => {
                 const wrapper = document.getElementById('password-wrapper');
@@ -874,12 +998,15 @@
         function updateSnippetInfo() {
             const info = document.getElementById('snippet-info');
             const delBtn = document.getElementById('delete-btn');
+            const shareBtn = document.getElementById('share-btn');
             if (snippetId) {
                 info.innerHTML = `Snippet ID: <span class="snippet-id">${snippetId}</span>`;
                 delBtn.style.display = 'inline-block';
+                shareBtn.style.display = 'inline-block';
             } else {
                 info.textContent = '';
                 delBtn.style.display = 'none';
+                shareBtn.style.display = 'none';
             }
         }
 
@@ -894,10 +1021,10 @@
             btn.title = dark ? 'Switch to light mode' : 'Switch to dark mode';
         }
 
-        function applyTheme(theme) {
+        function applyTheme(theme, save = true) {
             currentTheme = theme === 'dark' ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', currentTheme);
-            localStorage.setItem('theme', currentTheme);
+            if (save) localStorage.setItem('theme', currentTheme);
             if (window.monaco && monaco.editor) {
                 monaco.editor.setTheme(currentTheme === 'dark' ? 'code-dark' : 'code-light');
             }
@@ -905,7 +1032,7 @@
         }
 
         function toggleTheme() {
-            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark', true);
         }
     </script>
 </body>

@@ -526,9 +526,20 @@
 
             await fetchLanguages();
 
-            const pathId = window.location.pathname.substring(1);
-            if (pathId && pathId.length === 6) {
-                loadSnippet(pathId);
+            const path = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
+            const supportedLangs = ['python', 'go', 'golang', 'javascript', 'rust', 'cpp'];
+            
+            if (supportedLangs.includes(path)) {
+                const lang = path === 'go' ? 'golang' : path;
+                document.getElementById('language').value = lang;
+                originalCode = samples[lang] || "";
+                editor.setValue(originalCode);
+                updateLanguageDisplay(lang);
+                const model = editor.getModel();
+                const monacoLang = lang === 'golang' ? 'go' : lang;
+                monaco.editor.setModelLanguage(model, monacoLang);
+            } else if (path && path.length === 6) {
+                loadSnippet(path);
             } else {
                 updateLanguageDisplay('golang');
             }

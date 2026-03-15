@@ -851,6 +851,12 @@
                 const code = editor.getValue();
                 const password = document.getElementById('snippet-password').value;
                 const outputEl = document.getElementById('output');
+                const runBtn = document.getElementById('run-btn');
+                
+                // Set loading state
+                const originalBtnContent = runBtn.innerHTML;
+                runBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Running...</span>';
+                runBtn.disabled = true;
                 outputEl.textContent = 'Running...';
 
                 const body = { language, code };
@@ -892,6 +898,10 @@
                     }
                 } catch (err) {
                     outputEl.textContent = 'Error: ' + err.message;
+                } finally {
+                    // Restore button state
+                    runBtn.innerHTML = originalBtnContent;
+                    runBtn.disabled = false;
                 }
             });
 

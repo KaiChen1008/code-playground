@@ -57,7 +57,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.js"></script>
     <style>
         :root {
-            --ig-bg: #fafafa;
+            --ig-bg: #ffffff;
             --ig-card-bg: #ffffff;
             --ig-border: #dbdbdb;
             --ig-text: #262626;
@@ -66,7 +66,7 @@
             --ig-red: #ed4956;
             --ig-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
             --header-bg: #ffffff;
-            --card-header-bg: #f8f9fa;
+            --card-header-bg: #ffffff;
             --editor-bg: #ffffff;
             --output-text: #262626;
         }
@@ -92,7 +92,7 @@
             background-color: var(--ig-bg);
             color: var(--ig-text);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         body {
@@ -110,6 +110,8 @@
             border-bottom: 1px solid var(--ig-border);
             box-sizing: border-box;
             background-color: var(--header-bg);
+            position: sticky;
+            top: 0;
             z-index: 100;
         }
 
@@ -177,13 +179,16 @@
         main {
             flex: 1;
             width: 100%;
+            max-width: 1200px;
             display: flex;
             flex-direction: column;
             padding: 20px;
             gap: 20px;
             box-sizing: border-box;
-            overflow: hidden;
-            min-height: 0;
+        }
+
+        .editor-card {
+            height: 500px;
         }
 
         .card {
@@ -193,11 +198,6 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            min-height: 0;
-        }
-
-        .editor-card {
-            flex: 3;
         }
 
         .output-card {
@@ -221,6 +221,68 @@
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        .info-section {
+            display: flex;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .footer-card {
+            flex: 1;
+            padding: 12px;
+            background-color: var(--ig-card-bg);
+            border: 1px solid var(--ig-border);
+            border-radius: 10px;
+        }
+
+        .footer-card h2 {
+            font-size: 14px;
+            margin-top: 0;
+            margin-bottom: 8px;
+            background: var(--ig-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .footer-card p {
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--ig-secondary-text);
+            margin: 0;
+        }
+
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--ig-text);
+        }
+
+        .feature-item i {
+            color: var(--ig-blue);
+            font-size: 12px;
+        }
+
+        .site-footer {
+            width: 100%;
+            padding: 12px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--ig-secondary-text);
+            background-color: var(--ig-card-bg);
+            margin-top: 8px;
+            box-sizing: border-box;
         }
 
         .user-avatar {
@@ -372,6 +434,24 @@
             .card-title {
                 font-size: 13px;
             }
+
+            .info-section {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .footer-card {
+                padding: 12px;
+            }
+
+            .features-list {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .site-footer {
+                padding: 16px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -424,6 +504,24 @@
             </div>
             <pre id="output">Welcome to code. Write code and press Run.</pre>
         </div>
+
+        <section class="info-section">
+            <div class="footer-card">
+                <h2>About PolyRun</h2>
+                <p>PolyRun is a high-performance <strong>online code runner</strong> and <strong>playground</strong>. We provide a secure environment for developers to quickly test and share code snippets in <strong>Go (Golang)</strong>, <strong>Python</strong>, <strong>JavaScript (Node.js)</strong>, <strong>Rust</strong>, and <strong>C++</strong>. Our goal is to offer a minimalist, fast, and accessible alternative to traditional IDEs for rapid prototyping and educational purposes.</p>
+            </div>
+            <div class="footer-card">
+                <h2>PolyRun Features</h2>
+                <div class="features-list">
+                    <div class="feature-item"><i class="fas fa-shield-alt"></i> Secure Docker Isolation</div>
+                    <div class="feature-item"><i class="fas fa-bolt"></i> Instant Execution</div>
+                    <div class="feature-item"><i class="fas fa-share-alt"></i> Shareable Snippets</div>
+                    <div class="feature-item"><i class="fas fa-code"></i> Syntax Highlighting</div>
+                    <div class="feature-item"><i class="fas fa-lock"></i> Password Protection</div>
+                    <div class="feature-item"><i class="fas fa-magic"></i> Code Formatting</div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <div id="password-modal" class="modal-overlay">
@@ -443,6 +541,10 @@
             </div>
         </div>
     </div>
+
+    <footer class="site-footer">
+        &copy; 2026 PolyRun. Secure, Minimalist Code Execution Environment.
+    </footer>
 
     <script>
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs' } });
@@ -513,6 +615,9 @@
                 padding: { top: 16 },
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
+                scrollbar: {
+                    alwaysConsumeMouseWheel: false
+                },
                 lineNumbers: 'on',
                 renderLineHighlight: 'all',
                 fontFamily: "'JetBrains Mono', 'Fira Code', monospace",

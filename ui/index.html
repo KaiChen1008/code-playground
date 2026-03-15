@@ -4,7 +4,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>code</title>
+    <title>PolyRun - Online Code Runner & Playground (Go, Python, JS)</title>
+    <meta name="description" content="PolyRun is a secure, minimalist online code runner and playground. Write, compile, and execute Go, Python, and JavaScript code instantly in your browser. Self-hosted and docker-isolated.">
+    <meta name="keywords" content="online code runner, go playground, python online compiler, javascript playground, run code online, secure code execution, polyrun">
+    <meta name="author" content="PolyRun">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://polyrun.kaichenl.com">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://polyrun.kaichenl.com/">
+    <meta property="og:title" content="PolyRun - Online Code Runner & Playground">
+    <meta property="og:description" content="Secure, minimalist online code runner. Execute Go, Python, and JavaScript instantly.">
+    <meta property="og:image" content="https://polyrun.kaichenl.com/favicon.svg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://polyrun.kaichenl.com/">
+    <meta property="twitter:title" content="PolyRun - Online Code Runner">
+    <meta property="twitter:description" content="Secure, minimalist online code runner. Execute Go, Python, and JavaScript instantly.">
+    <meta property="twitter:image" content="https://polyrun.kaichenl.com/favicon.svg">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "PolyRun",
+      "operatingSystem": "Web",
+      "applicationCategory": "DeveloperApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A secure, minimalist online code runner for Go, Python, and JavaScript.",
+      "featureList": "Multi-language support, Docker isolation, Syntax highlighting, Shareable snippets"
+    }
+    </script>
+
     <script>
         (function () {
             const stored = localStorage.getItem('theme');
@@ -340,7 +378,7 @@
 
 <body>
     <header>
-        <div class="logo" onclick="window.location.href='/'">code</div>
+        <h1 class="logo" onclick="window.location.href='/'" style="margin:0;">PolyRun</h1>
         <div class="controls">
             <select id="language">
                 <!-- Will be populated dynamically -->

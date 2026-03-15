@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 	"sync"
@@ -8,10 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"
 
+	"code-playground/cmd/server/domain"
 	"code-playground/ui"
 )
 
-func NewRouter(rateLimit int, handler *SnippetHandler) *gin.Engine {
+func NewRouter(rateLimit int, handler *SnippetHandler, uc domain.Usecase) *gin.Engine {
 	r := gin.Default()
 	r.Use(corsMiddleware())
 	r.Use(rateLimitMiddleware(rateLimit))
@@ -25,7 +27,7 @@ func NewRouter(rateLimit int, handler *SnippetHandler) *gin.Engine {
 		v1.GET("/languages", handler.GetLanguages)
 	}
 
-	r.NoRoute(uiHandler())
+	r.NoRoute(uiHandler(uc))
 
 	return r
 }
@@ -75,7 +77,7 @@ func corsMiddleware() gin.HandlerFunc {
 	}
 }
 
-func uiHandler() gin.HandlerFunc {
+func uiHandler(uc domain.Usecase) gin.HandlerFunc {
 	fileServer := http.FileServer(http.FS(ui.Static))
 
 	return func(c *gin.Context) {
@@ -103,10 +105,11 @@ func uiHandler() gin.HandlerFunc {
 		}
 
 		// Inject dynamic meta tags for language landing pages
-		lang := strings.Trim(path, "/")
-		if info, ok := getLanguageMeta(lang); ok {
-			html := string(index)
-			
+		html := string(index)
+		langOrID := strings.Trim(path, "/")
+
+		// 1. Check for Language Landing Pages
+		if info, ok := getLanguageMeta(langOrID); ok {
 			// Replace Titles
 			html = strings.Replace(html, "<title>PolyRun - Online Code Runner & Playground (Go, Python, JS)</title>", "<title>"+info.Title+"</title>", 1)
 			html = strings.ReplaceAll(html, "content=\"PolyRun - Online Code Runner & Playground\"", "content=\""+info.Title+"\"")
@@ -120,7 +123,7 @@ func uiHandler() gin.HandlerFunc {
 			}
 			
 			// Update URLs
-			fullURL := "https://polyrun.kaichenl.com/" + strings.ToLower(lang)
+			fullURL := "https://polyrun.kaichenl.com/" + strings.ToLower(langOrID)
 			html = strings.Replace(html, "href=\"https://polyrun.kaichenl.com\"", "href=\""+fullURL+"\"", 1)
 			html = strings.ReplaceAll(html, "content=\"https://polyrun.kaichenl.com/\"", "content=\""+fullURL+"\"")
 
@@ -128,7 +131,44 @@ func uiHandler() gin.HandlerFunc {
 			return
 		}
 
-		c.Data(http.StatusOK, "text/html; charset=utf-8", index)
+		// 2. Check for Snippet ID (Dynamic Meta)
+		if len(langOrID) == 6 {
+			// Try to fetch snippet info for meta tags (without password)
+			snippet, err := uc.GetSnippet(c.Request.Context(), langOrID, "")
+			// If it requires password, GetSnippet returns error, but we can still show a generic "Protected" meta
+			
+			title := "PolyRun Snippet " + langOrID
+			description := "Check out this code snippet on PolyRun."
+			
+			if err == nil {
+				title = fmt.Sprintf("PolyRun %s Snippet (%s)", strings.Title(snippet.Language), langOrID)
+				preview := snippet.Code
+				if len(preview) > 100 {
+					preview = preview[:97] + "..."
+				}
+				description = fmt.Sprintf("Run this %s code on PolyRun: %s", snippet.Language, preview)
+			} else if err != nil && (err.Error() == "password required" || err.Error() == "invalid password") {
+				title = "Protected PolyRun Snippet (" + langOrID + ")"
+				description = "This code snippet is password protected on PolyRun."
+			}
+
+			html = strings.Replace(html, "<title>PolyRun - Online Code Runner & Playground (Go, Python, JS)</title>", "<title>"+title+"</title>", 1)
+			html = strings.ReplaceAll(html, "content=\"PolyRun - Online Code Runner & Playground\"", "content=\""+title+"\"")
+			html = strings.ReplaceAll(html, "content=\"PolyRun - Online Code Runner\"", "content=\""+title+"\"")
+			
+			html = strings.Replace(html, "content=\"PolyRun is a secure, minimalist online code runner and playground. Write, compile, and execute Go, Python, and JavaScript code instantly in your browser. Self-hosted and docker-isolated.\"", "content=\""+description+"\"", 1)
+			html = strings.ReplaceAll(html, "content=\"Secure, minimalist online code runner. Execute Go, Python, and JavaScript instantly.\"", "content=\""+description+"\"")
+			html = strings.Replace(html, "\"description\": \"A secure, minimalist online code runner for Go, Python, and JavaScript.\"", "\"description\": \""+description+"\"", 1)
+
+			fullURL := "https://polyrun.kaichenl.com/" + langOrID
+			html = strings.Replace(html, "href=\"https://polyrun.kaichenl.com\"", "href=\""+fullURL+"\"", 1)
+			html = strings.ReplaceAll(html, "content=\"https://polyrun.kaichenl.com/\"", "content=\""+fullURL+"\"")
+
+			c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))
+			return
+		}
+
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))
 	}
 }
 

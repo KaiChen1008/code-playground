@@ -47,7 +47,7 @@ func main() {
 	}
 	uc := usecase.New(repo, codeRunner, maxCodeChars, maxTotalSubmissions, languages, maxConcurrentRunners)
 	handler := delivery.NewSnippetHandler(uc)
-	r := delivery.NewRouter(rateLimit, handler)
+	r := delivery.NewRouter(rateLimit, handler, uc)
 
 	addr := fmt.Sprintf(":%d", port)
 	svr := &http.Server{
